@@ -93,27 +93,11 @@ function InquiryCard({
       <button
         type="button"
         onClick={onToggle}
-        className="w-full text-left cursor-pointer"
-        style={{
-          padding: '16px 20px',
-          display: 'grid',
-          gridTemplateColumns: '1fr auto',
-          gap: 16,
-          alignItems: 'center',
-          background: 'none',
-          border: 'none',
-        }}
+        className="w-full text-left cursor-pointer p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-transparent border-none"
       >
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'minmax(0,1.2fr) minmax(0,1.2fr) minmax(0,0.8fr)',
-            gap: '8px 16px',
-            alignItems: 'center',
-          }}
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(0,0.8fr)] gap-2 sm:gap-4 items-start sm:items-center w-full min-w-0 flex-1">
           {/* Name + Service */}
-          <div>
+          <div className="min-w-0">
             <p
               style={{
                 fontFamily: "'DM Sans', system-ui, sans-serif",
@@ -139,13 +123,14 @@ function InquiryCard({
           </div>
 
           {/* Email / Phone */}
-          <div>
+          <div className="min-w-0">
             <p
               style={{
                 fontFamily: "'DM Sans', system-ui, sans-serif",
                 fontSize: 12,
                 color: '#3D3937',
                 margin: 0,
+                wordBreak: 'break-all',
               }}
             >
               {inquiry.email}
@@ -178,7 +163,7 @@ function InquiryCard({
         </div>
 
         {/* Status + Expand indicator */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+        <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto shrink-0 pt-2 sm:pt-0 border-t border-stroke/40 sm:border-t-0">
           <StatusBadge status={inquiry.status} />
           <span
             style={{
@@ -621,14 +606,15 @@ export default function AdminDashboard() {
           style={{
             maxWidth: 1100,
             margin: '0 auto',
-            padding: '0 24px',
+            padding: '0 16px',
             height: 60,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            gap: 8,
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
             <a
               href="/"
               style={{
@@ -638,27 +624,31 @@ export default function AdminDashboard() {
                 color: '#0D0C0B',
                 textDecoration: 'none',
                 letterSpacing: '0.04em',
+                whiteSpace: 'nowrap',
               }}
             >
               Sujal Vende
             </a>
             <span
-              style={{ width: 1, height: 16, background: '#E3DDD7', display: 'inline-block' }}
+              style={{ width: 1, height: 16, background: '#E3DDD7', display: 'inline-block', flexShrink: 0 }}
             />
+            {/* Label hidden on very small screens to prevent wrapping */}
             <span
+              className="hidden sm:inline"
               style={{
                 fontFamily: sans,
                 fontSize: 10,
                 letterSpacing: '0.18em',
                 textTransform: 'uppercase',
                 color: '#6E6A66',
+                whiteSpace: 'nowrap',
               }}
             >
               Admin Dashboard
             </span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
             <a
               href="/"
               target="_blank"
@@ -668,11 +658,12 @@ export default function AdminDashboard() {
                 fontSize: 12,
                 color: '#0D0C0B',
                 border: '1px solid #E3DDD7',
-                padding: '6px 14px',
+                padding: '6px 12px',
                 textDecoration: 'none',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 4,
+                whiteSpace: 'nowrap',
               }}
             >
               Visit Site ↗
@@ -687,8 +678,9 @@ export default function AdminDashboard() {
                 color: '#6E6A66',
                 background: 'none',
                 border: '1px solid #E3DDD7',
-                padding: '6px 14px',
+                padding: '6px 12px',
                 cursor: 'pointer',
+                whiteSpace: 'nowrap',
               }}
             >
               Log Out
@@ -698,13 +690,13 @@ export default function AdminDashboard() {
       </header>
 
       {/* ── Main Content ────────────────────────────────────────────────── */}
-      <main style={{ maxWidth: 1100, margin: '0 auto', padding: '36px 24px 80px' }}>
+      <main style={{ maxWidth: 1100, margin: '0 auto', padding: '28px 16px 80px' }}>
         {/* Page title with inquiries count */}
-        <div style={{ marginBottom: 28 }}>
+        <div style={{ marginBottom: 24 }}>
           <h1
             style={{
               fontFamily: serif,
-              fontSize: 32,
+              fontSize: 'clamp(24px, 5vw, 32px)',
               color: '#0D0C0B',
               lineHeight: 1.15,
               margin: '0 0 8px',
@@ -749,6 +741,7 @@ export default function AdminDashboard() {
                     fontFamily: 'monospace',
                     fontSize: 11,
                     userSelect: 'all',
+                    wordBreak: 'break-all',
                   }}
                 >
                   INSERT INTO admin_users (user_id) VALUES ('{unauthorizedUserId}') ON CONFLICT DO NOTHING;
@@ -763,16 +756,17 @@ export default function AdminDashboard() {
           style={{
             display: 'flex',
             flexWrap: 'wrap',
-            gap: 12,
-            marginBottom: 22,
+            gap: 10,
+            marginBottom: 20,
             alignItems: 'center',
           }}
         >
+          {/* Search — full-width row when wrapping on mobile */}
           <input
             type="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search name, email, service or message…"
+            placeholder="Search name, email, service…"
             style={{
               fontFamily: sans,
               fontSize: 13,
@@ -780,7 +774,8 @@ export default function AdminDashboard() {
               background: '#F9F7F4',
               border: '1px solid #E3DDD7',
               padding: '9px 14px',
-              flex: '1 1 240px',
+              flex: '1 1 200px',
+              minWidth: 0,
               outline: 'none',
             }}
           />
@@ -797,6 +792,7 @@ export default function AdminDashboard() {
               padding: '9px 28px 9px 12px',
               appearance: 'none',
               cursor: 'pointer',
+              flex: '0 0 auto',
             }}
           >
             <option value="all">All Statuses</option>
@@ -819,6 +815,7 @@ export default function AdminDashboard() {
               padding: '9px 28px 9px 12px',
               appearance: 'none',
               cursor: 'pointer',
+              flex: '0 0 auto',
             }}
           >
             <option value="newest">Newest First</option>
@@ -834,8 +831,9 @@ export default function AdminDashboard() {
               color: '#6E6A66',
               background: 'none',
               border: '1px solid #E3DDD7',
-              padding: '9px 16px',
+              padding: '9px 14px',
               cursor: 'pointer',
+              flex: '0 0 auto',
             }}
           >
             Refresh
@@ -860,14 +858,14 @@ export default function AdminDashboard() {
           </div>
         ) : (
           <div>
-            {/* Column Headers */}
+            {/* Column Headers — hidden on small screens, shown on wider viewports */}
             <div
+              className="hidden sm:grid"
               style={{
-                display: 'grid',
                 gridTemplateColumns:
                   'minmax(0,1.2fr) minmax(0,1.2fr) minmax(0,0.8fr) auto',
                 gap: '8px 16px',
-                padding: '0 20px 8px',
+                padding: '0 16px 8px',
                 alignItems: 'center',
               }}
             >

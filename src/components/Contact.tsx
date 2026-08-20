@@ -177,7 +177,7 @@ export default function Contact() {
 
   return (
     <section ref={sectionRef} id="contact" className="border-t border-stroke bg-ivory">
-      <div className="max-w-[1280px] mx-auto px-6 md:px-12 lg:px-20 py-24 md:py-36">
+      <div className="max-w-[1280px] mx-auto px-6 md:px-12 lg:px-20 py-14 md:py-24 lg:py-36">
         <div className="grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-16 lg:gap-24 items-start">
           {/* ── Left Column — Heading & Direct Info ────────────────────────── */}
           <div className="contact-reveal">
@@ -429,14 +429,15 @@ export default function Contact() {
                 )}
 
                 {/* Submit Action */}
-                <div className="flex items-center justify-between pt-2">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-2">
                   <p className="font-sans text-[11px] text-ink-muted">
                     <span className="text-bronze">*</span> Required fields
                   </p>
                   <button
                     type="submit"
                     disabled={formState === 'loading'}
-                    className="font-sans text-[13px] font-medium text-ink border border-ink/40 px-8 py-3.5 hover:bg-ink hover:text-ivory transition-all duration-250 inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full sm:w-auto font-sans text-[13px] font-medium text-ink border border-ink/40 px-8 py-3.5 hover:bg-ink hover:text-ivory transition-all duration-250 inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ minHeight: 48 }}
                   >
                     {formState === 'loading' ? (
                       <>Sending…</>

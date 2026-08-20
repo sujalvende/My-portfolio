@@ -57,7 +57,7 @@ export default function Services() {
 
   return (
     <section ref={sectionRef} id="services" className="border-t border-stroke">
-      <div className="max-w-[1280px] mx-auto px-6 md:px-12 lg:px-20 py-20 md:py-28">
+      <div className="max-w-[1280px] mx-auto px-6 md:px-12 lg:px-20 py-14 md:py-20 lg:py-28">
         <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-10 md:gap-20 items-start">
           <div className="service-reveal">
             <span className="font-sans text-[10px] uppercase tracking-[0.22em] text-ink-muted block mb-5">
@@ -72,7 +72,7 @@ export default function Services() {
             {services.map((service) => (
               <div
                 key={service.number}
-                className="service-reveal border-t border-stroke pt-7 pb-8 sm:pr-8"
+                className="service-reveal border-t border-stroke pt-7 pb-8 pr-0 sm:pr-8"
               >
                 <span className="font-sans text-[10px] uppercase tracking-[0.22em] text-ink-muted block mb-5">
                   {service.number}

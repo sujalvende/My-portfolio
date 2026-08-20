@@ -49,7 +49,7 @@ export default function Skills() {
 
   return (
     <section ref={sectionRef} id="skills" className="border-t border-stroke">
-      <div className="max-w-[1280px] mx-auto px-6 md:px-12 lg:px-20 py-20 md:py-28">
+      <div className="max-w-[1280px] mx-auto px-6 md:px-12 lg:px-20 py-14 md:py-20 lg:py-28">
         <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-10 md:gap-20 items-start">
           <div className="skills-reveal">
             <span className="font-sans text-[10px] uppercase tracking-[0.22em] text-ink-muted block mb-5">
@@ -62,7 +62,7 @@ export default function Skills() {
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-0">
             {skillGroups.map((group) => (
-              <div key={group.category} className="skills-reveal border-t border-stroke pt-6 pb-8 pr-6">
+              <div key={group.category} className="skills-reveal border-t border-stroke pt-6 pb-8 pr-0 sm:pr-6">
                 <p className="font-sans text-[10px] uppercase tracking-[0.2em] text-ink-muted mb-5">
                   {group.category}
                 </p>

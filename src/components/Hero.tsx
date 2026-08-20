@@ -113,7 +113,7 @@ export default function Hero() {
     <section
       ref={sectionRef}
       id="hero"
-      className="relative overflow-hidden pt-[76px] md:pt-[84px] bg-ivory min-h-[92vh] lg:min-h-screen flex items-center"
+      className="relative overflow-hidden pt-[68px] md:pt-[84px] bg-ivory min-h-[100svh] lg:min-h-screen flex items-center"
       aria-label="Hero — Sujal Vende, Full-Stack Developer"
     >
       {/* ── DESKTOP LAYOUT ──────────────────────────────────────────────── */}
@@ -217,27 +217,39 @@ export default function Hero() {
 
       {/* ── MOBILE / TABLET LAYOUT ─────────────────────────────────────── */}
       <div className="lg:hidden w-full flex flex-col">
-        {/* Editorial Photograph at Top */}
-        <div className="relative w-full h-[54vh] max-h-[500px] overflow-hidden">
+        {/* Portrait — sized to show face on all screen widths 320–768px */}
+        <div
+          className="relative w-full overflow-hidden"
+          style={{
+            /* Fluid height: tall enough to show portrait, short enough to leave
+               room for text below on phones with small viewport heights.
+               Using svh (small viewport height — excludes mobile browser chrome)
+               so the hero never clips under the address bar. */
+            height: 'clamp(200px, 44svh, 420px)',
+          }}
+        >
           <img
             src={heroPortraitSrc}
             alt="Sujal Vende — Full-Stack Developer"
-            className="w-full h-full object-cover object-[60%_20%]"
-            style={{ filter: 'brightness(0.98) saturate(0.96)' }}
+            className="w-full h-full object-cover"
+            style={{
+              objectPosition: '55% 18%',
+              filter: 'brightness(0.98) saturate(0.96)',
+            }}
             loading="eager"
             draggable={false}
           />
-          {/* Bottom fade into ivory content */}
+          {/* Bottom fade into ivory content area */}
           <div
-            className="absolute inset-x-0 bottom-0 h-36 pointer-events-none"
+            className="absolute inset-x-0 bottom-0 h-28 pointer-events-none"
             style={{
               background: 'linear-gradient(to top, #F9F7F4 0%, rgba(249,247,244,0) 100%)',
             }}
           />
         </div>
 
-        {/* Typography Below */}
-        <div className="px-6 py-8 pb-16 flex flex-col justify-center">
+        {/* Typography Below Portrait */}
+        <div className="px-5 pt-5 pb-10 flex flex-col justify-center">
           <p
             className="hero-reveal font-sans uppercase tracking-[0.2em] text-ink-muted mb-4"
             style={{ fontSize: 10 }}
@@ -247,33 +259,34 @@ export default function Hero() {
           <h1
             className="hero-reveal font-serif text-ink"
             style={{
-              fontSize: 'clamp(34px, 8.5vw, 50px)',
+              fontSize: 'clamp(30px, 7.5vw, 50px)',
               lineHeight: 1.1,
               letterSpacing: '-0.02em',
-              marginBottom: '1.25rem',
+              marginBottom: '1rem',
             }}
           >
             I turn ideas into digital reality.
           </h1>
           <p
             className="hero-reveal font-sans text-ink-muted"
-            style={{ fontSize: 15, lineHeight: 1.68, marginBottom: '2.25rem', maxWidth: 420 }}
+            style={{ fontSize: 15, lineHeight: 1.7, marginBottom: '2rem', maxWidth: 440 }}
           >
             I build thoughtful websites and digital experiences for businesses,
             creators, and ideas that deserve to exist online.
           </p>
-          <div className="hero-cta-wrap hero-reveal flex flex-wrap items-center gap-4">
+          {/* CTAs — flex-wrap so they never overflow on 320px */}
+          <div className="hero-cta-wrap hero-reveal flex flex-wrap items-center gap-3">
             <a
               href="#work"
               className="font-sans text-ink border border-ink/30 hover:border-ink hover:bg-ink hover:text-ivory transition-all duration-200 inline-flex items-center gap-2"
-              style={{ fontSize: 13, fontWeight: 500, padding: '12px 22px' }}
+              style={{ fontSize: 13, fontWeight: 500, padding: '13px 22px', minHeight: 44 }}
             >
               View My Work →
             </a>
             <a
               href="#contact"
-              className="font-sans text-ink-mid hover:text-ink transition-colors duration-200 inline-flex items-center gap-1"
-              style={{ fontSize: 13, padding: '12px 14px' }}
+              className="font-sans text-ink border border-ink/20 hover:border-ink hover:bg-ink hover:text-ivory transition-all duration-200 inline-flex items-center gap-1.5"
+              style={{ fontSize: 13, padding: '13px 18px', minHeight: 44 }}
             >
               Let's Talk →
             </a>

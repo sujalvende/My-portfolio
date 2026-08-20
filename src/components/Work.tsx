@@ -153,7 +153,7 @@ export default function Work() {
     <section
       ref={sectionRef}
       id="work"
-      className="border-t border-stroke py-16 lg:py-0 lg:min-h-screen lg:flex lg:flex-col lg:justify-center bg-ivory"
+      className="border-t border-stroke py-14 lg:py-0 lg:min-h-screen lg:flex lg:flex-col lg:justify-center bg-ivory"
     >
       <div className="max-w-[1200px] w-full mx-auto px-6 md:px-10 xl:px-12">
         {/* ── Section Header ─────────────────────────────────────────────── */}
@@ -303,8 +303,8 @@ export default function Work() {
           ))}
         </div>
 
-        {/* ── MOBILE / TABLET: Refined stacked vertical cards ────────────── */}
-        <div className="lg:hidden space-y-8">
+        {/* ── MOBILE / TABLET: Refined stacked vertical cards ──────────────── */}
+        <div className="lg:hidden space-y-6">
           {projects.map((project) => (
             <div
               key={project.number}
@@ -315,8 +315,8 @@ export default function Work() {
                 href={project.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                data-cursor="project"
-                className="block relative aspect-[16/10] overflow-hidden"
+                className="block relative overflow-hidden"
+                style={{ aspectRatio: '16/10' }}
                 aria-label={`Open ${project.title}`}
               >
                 <img
@@ -328,41 +328,64 @@ export default function Work() {
               </a>
 
               {/* Content */}
-              <div className="p-6">
+              <div className="p-6 pb-7">
                 <div className="flex items-center gap-3 mb-3">
                   <span className="font-sans text-[10px] uppercase tracking-[0.22em] text-ink-muted">
                     {project.number}
                   </span>
                   <span className="w-5 h-px bg-stroke inline-block" />
+                  <span className="font-sans text-[10px] uppercase tracking-[0.18em] text-ink-muted">
+                    Featured Project
+                  </span>
                 </div>
 
-                <h3 className="font-serif text-[24px] text-ink mb-3 leading-[1.18]">
+                <h3 className="font-serif text-[22px] text-ink mb-3 leading-[1.18]">
                   {project.title}
                 </h3>
 
-                <p className="font-sans text-[14px] text-ink-muted leading-[1.68] mb-5">
+                <p className="font-sans text-[14px] text-ink-muted leading-[1.68] mb-4">
                   {project.description}
                 </p>
 
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {project.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="font-sans text-[10px] uppercase tracking-[0.16em] text-ink-muted border border-stroke px-2.5 py-1 rounded"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+                {/* What I built — restored for mobile parity with desktop */}
+                <div className="mb-5">
+                  <p className="font-sans text-[10px] uppercase tracking-[0.18em] text-ink-muted mb-2.5">
+                    What I built
+                  </p>
+                  <ul className="space-y-1.5">
+                    {project.built.map((item) => (
+                      <li
+                        key={item}
+                        className="font-sans text-[13px] text-ink-mid flex items-start gap-2"
+                      >
+                        <span className="text-bronze mt-px shrink-0">—</span>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
-                <a
-                  href={project.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-sans text-[13px] font-medium text-ink inline-flex items-center gap-1.5 border-b border-ink/30 pb-0.5"
-                >
-                  View Project ↗
-                </a>
+                {/* Tags + CTA */}
+                <div className="pt-4 border-t border-stroke/60 flex items-center justify-between gap-3 flex-wrap">
+                  <div className="flex flex-wrap gap-2">
+                    {project.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="font-sans text-[10px] uppercase tracking-[0.16em] text-ink-muted border border-stroke px-2.5 py-1 rounded"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <a
+                    href={project.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-sans text-[13px] font-medium text-ink inline-flex items-center gap-1.5 border-b border-ink/30 pb-0.5 shrink-0"
+                  >
+                    View Project ↗
+                  </a>
+                </div>
               </div>
             </div>
           ))}

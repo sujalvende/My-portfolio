@@ -30,19 +30,26 @@ export default function Intro() {
 
   return (
     <section ref={sectionRef} className="border-t border-stroke">
-      <div className="max-w-[1280px] mx-auto px-6 md:px-12 lg:px-20 py-20 md:py-28">
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-10 md:gap-20 items-start">
-          <div className="intro-reveal">
+      <div className="max-w-[1280px] mx-auto px-6 md:px-12 lg:px-20 py-12 md:py-20 lg:py-28">
+        {/* Mobile: single-column — label + heading + body stacked naturally */}
+        {/* Desktop: two-column — label left, content right */}
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-6 md:gap-10 lg:gap-20 items-start">
+          {/* Label — visible only on md+ as its own column */}
+          <div className="intro-reveal hidden md:block">
             <span className="font-sans text-[10px] uppercase tracking-[0.22em] text-ink-muted">
               01 / Introduction
             </span>
           </div>
 
           <div>
-            <h2 className="intro-reveal font-serif text-[clamp(26px,3.5vw,40px)] leading-[1.2] text-ink mb-7 max-w-[580px]">
+            {/* Mobile-only label inline above heading */}
+            <span className="intro-reveal md:hidden block font-sans text-[10px] uppercase tracking-[0.22em] text-ink-muted mb-5">
+              01 / Introduction
+            </span>
+            <h2 className="intro-reveal font-serif text-[clamp(24px,3.5vw,40px)] leading-[1.2] text-ink mb-6 md:mb-7 max-w-[580px]">
               From an idea on paper to something people can actually use.
             </h2>
-            <p className="intro-reveal font-sans text-[16px] md:text-[17px] text-ink-muted leading-[1.72] max-w-[520px]">
+            <p className="intro-reveal font-sans text-[15px] md:text-[17px] text-ink-muted leading-[1.72] max-w-[520px]">
               I don't start with code. I start with the objective — what this needs to accomplish, who it's for, and what it should feel like. The design and development follow from there. The result is a website that works because it was understood first.
             </p>
           </div>

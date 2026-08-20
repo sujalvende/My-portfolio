@@ -30,7 +30,7 @@ export default function About() {
 
   return (
     <section ref={sectionRef} id="about" className="border-t border-stroke">
-      <div className="max-w-[1280px] mx-auto px-6 md:px-12 lg:px-20 py-20 md:py-28">
+      <div className="max-w-[1280px] mx-auto px-6 md:px-12 lg:px-20 py-14 md:py-20 lg:py-28">
         <div className="grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-12 lg:gap-24 items-start">
           {/* Left column */}
           <div>
@@ -54,13 +54,13 @@ export default function About() {
 
           {/* Right column */}
           <div className="space-y-6">
-            <p className="about-reveal font-sans text-[17px] md:text-[18px] text-ink-mid leading-[1.72]">
+            <p className="about-reveal font-sans text-[16px] md:text-[18px] text-ink-mid leading-[1.72]">
               I'm Sujal Vende, a BSc IT student and developer from Navi Mumbai, focused on building modern web experiences. I work primarily with HTML, CSS, JavaScript, React and modern frontend tools, while continuing to expand into full-stack development.
             </p>
-            <p className="about-reveal font-sans text-[17px] md:text-[18px] text-ink-muted leading-[1.72]">
+            <p className="about-reveal font-sans text-[16px] md:text-[18px] text-ink-muted leading-[1.72]">
               I enjoy taking an idea, understanding what it needs to accomplish, and turning it into something clear, useful and visually refined. I care about the quality of what I build — not just that it works, but that it feels right to use.
             </p>
-            <p className="about-reveal font-sans text-[17px] md:text-[18px] text-ink-muted leading-[1.72]">
+            <p className="about-reveal font-sans text-[16px] md:text-[18px] text-ink-muted leading-[1.72]">
               Right now I'm looking for opportunities to work with people who have ideas worth building. If that's you, I'd like to hear about it.
             </p>
           </div>

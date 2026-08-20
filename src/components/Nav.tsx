@@ -59,9 +59,9 @@ export default function Nav() {
           </a>
         </div>
 
-        {/* Mobile menu button */}
+        {/* Mobile menu button — 44×44px minimum touch target */}
         <button
-          className="md:hidden flex flex-col justify-center gap-[5px] p-2 -mr-2"
+          className="md:hidden flex flex-col justify-center gap-[5px] p-3 -mr-3 min-w-[44px] min-h-[44px]"
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label={menuOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={menuOpen}
@@ -106,7 +106,8 @@ export default function Nav() {
           ))}
           <a
             href="#contact"
-            className="block mt-6 font-sans text-[15px] text-ink"
+            className="block mt-6 font-sans text-[14px] font-medium text-ink border border-ink/30 px-5 py-3 hover:bg-ink hover:text-ivory transition-all duration-200 inline-flex items-center justify-center gap-1.5"
+            style={{ minHeight: 44 }}
             onClick={() => setMenuOpen(false)}
           >
             Let's Talk →

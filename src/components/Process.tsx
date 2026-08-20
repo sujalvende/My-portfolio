@@ -51,7 +51,7 @@ export default function Process() {
 
   return (
     <section ref={sectionRef} className="border-t border-stroke">
-      <div className="max-w-[1280px] mx-auto px-6 md:px-12 lg:px-20 py-20 md:py-28">
+      <div className="max-w-[1280px] mx-auto px-6 md:px-12 lg:px-20 py-14 md:py-20 lg:py-28">
         <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-10 md:gap-20 items-start">
           <div className="process-reveal">
             <span className="font-sans text-[10px] uppercase tracking-[0.22em] text-ink-muted block mb-5">
@@ -66,7 +66,7 @@ export default function Process() {
             {steps.map((step) => (
               <div
                 key={step.number}
-                className="process-reveal border-t border-stroke pt-7 pb-8 sm:pr-8"
+                className="process-reveal border-t border-stroke pt-7 pb-8 pr-0 sm:pr-8"
               >
                 <span className="font-serif text-[13px] italic text-bronze block mb-5">
                   {step.number}
