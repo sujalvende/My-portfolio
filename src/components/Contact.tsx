@@ -409,10 +409,22 @@ export default function Contact() {
                   </div>
                 </div>
 
-                {/* Server Error Banner */}
+                {/* Server Error / Setup Banner with direct email fallback */}
                 {formState === 'error' && serverError && (
-                  <div className="border border-bronze/40 bg-bronze/5 px-4 py-3">
-                    <p className="font-sans text-[13px] text-bronze">{serverError}</p>
+                  <div className="border border-bronze/40 bg-bronze/5 p-4 space-y-3">
+                    <p className="font-sans text-[13px] text-bronze leading-relaxed">{serverError}</p>
+                    <div className="pt-1">
+                      <a
+                        href={`mailto:sujalvende9@gmail.com?subject=${encodeURIComponent(
+                          `Project Inquiry: ${form.service || 'Website'} - ${form.name || 'Visitor'}`,
+                        )}&body=${encodeURIComponent(
+                          `Name: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\nService: ${form.service}\nBudget: ${form.budget}\n\nMessage:\n${form.message}`,
+                        )}`}
+                        className="inline-flex items-center gap-2 font-sans text-[12px] font-medium text-ink bg-white/80 border border-ink/20 px-3.5 py-2 hover:bg-ink hover:text-ivory transition-all duration-200"
+                      >
+                        Send via Email Instead ↗
+                      </a>
+                    </div>
                   </div>
                 )}
 

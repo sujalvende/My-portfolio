@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 
 type CursorState = 'default' | 'link' | 'project' | 'talk'
 
@@ -9,6 +10,9 @@ const prefersReducedMotion =
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 export default function Cursor() {
+  const location = useLocation()
+  const isAdmin = location.pathname.startsWith('/admin')
+
   const dotRef = useRef<HTMLDivElement>(null)
   const ringRef = useRef<HTMLDivElement>(null)
   const [cursorState, setCursorState] = useState<CursorState>('default')
@@ -16,8 +20,14 @@ export default function Cursor() {
   const [label, setLabel] = useState('')
 
   useEffect(() => {
-    // Disable on touch / reduced-motion
-    if (isTouch || prefersReducedMotion) return
+    // Disable on admin routes, touch, or reduced-motion
+    if (isAdmin || isTouch || prefersReducedMotion) {
+      document.body.classList.remove('custom-cursor-active')
+      return
+    }
+
+    // Enable custom cursor styles on body for public routes
+    document.body.classList.add('custom-cursor-active')
 
     let dotX = 0, dotY = 0
     let ringX = 0, ringY = 0
@@ -76,15 +86,16 @@ export default function Cursor() {
 
     return () => {
       cancelAnimationFrame(rafId)
+      document.body.classList.remove('custom-cursor-active')
       document.removeEventListener('mousemove', onMouseMove)
       document.removeEventListener('mouseover', onOver)
       document.removeEventListener('mouseleave', onMouseLeave)
       document.removeEventListener('mouseenter', onMouseEnter)
     }
-  }, [])
+  }, [isAdmin])
 
-  // Don't render cursor elements on touch devices at all
-  if (isTouch) return null
+  // Don't render cursor elements on admin routes or touch devices
+  if (isAdmin || isTouch || prefersReducedMotion) return null
 
   const ringSize =
     cursorState === 'link' ? 44 :

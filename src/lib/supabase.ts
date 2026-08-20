@@ -86,14 +86,19 @@ export interface Database {
   }
 }
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || ''
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
+const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL || '').trim()
+const supabaseAnonKey = (
+  import.meta.env.VITE_SUPABASE_ANON_KEY ||
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+  ''
+).trim()
 
 export const isSupabaseConfigured = Boolean(
   supabaseUrl &&
     supabaseAnonKey &&
     !supabaseUrl.includes('your-project') &&
-    !supabaseAnonKey.includes('your-anon-key'),
+    !supabaseAnonKey.includes('your-anon-key') &&
+    !supabaseAnonKey.includes('placeholder'),
 )
 
 // Initialize client with fallback placeholder to prevent runtime crash during initialization

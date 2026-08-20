@@ -17,7 +17,6 @@ import AdminDashboard from './pages/AdminDashboard'
 function Portfolio() {
   return (
     <div className="bg-ivory min-h-screen">
-      <Cursor />
       <Nav />
       <main>
         <Hero />
@@ -36,12 +35,16 @@ function Portfolio() {
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Portfolio />} />
-      <Route path="/admin" element={<AdminLogin />} />
-      <Route path="/admin/dashboard" element={<AdminDashboard />} />
-      {/* Catch-all */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <>
+      <Cursor />
+      <Routes>
+        <Route path="/" element={<Portfolio />} />
+        <Route path="/admin" element={<AdminLogin />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        {/* Catch-all */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   )
 }
