@@ -1,0 +1,10 @@
+{
+  "description": "This platform showcases premium creative services with a timeless, minimalistic design, instilling trust and confidence in clients seeking sophisticated solutions.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

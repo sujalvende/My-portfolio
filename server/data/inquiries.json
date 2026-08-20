@@ -1,0 +1,35 @@
+[
+  {
+    "id": "2d9b0b55-6da9-4826-9845-9017365393a6",
+    "name": "Sujal Vende",
+    "email": "sujalvende9@gmail.com",
+    "phone": "+917977469282",
+    "service": "Website",
+    "budget": "₹15,000 – ₹30,000",
+    "message": "Yohoohhohhoh",
+    "status": "Contacted",
+    "createdAt": "2026-08-20T20:00:49.816Z"
+  },
+  {
+    "id": "5c589f9e-5537-4323-bd67-9e9f9c7724e0",
+    "name": "Sujal Vende",
+    "email": "sujalvende9@gmail.com",
+    "phone": "+917977469282",
+    "service": "Web Application",
+    "budget": "₹60,000+",
+    "message": "Hello there my friend",
+    "status": "New",
+    "createdAt": "2026-08-20T19:51:52.176Z"
+  },
+  {
+    "id": "55e35dcc-3d04-4e82-96ee-803a59231222",
+    "name": "Test User",
+    "email": "test@example.com",
+    "phone": "",
+    "service": "Website",
+    "budget": "",
+    "message": "This is a test inquiry for the portfolio.",
+    "status": "New",
+    "createdAt": "2026-08-20T19:17:41.430Z"
+  }
+]
