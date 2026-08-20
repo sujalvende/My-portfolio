@@ -1,36 +1,62 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { supabase, isSupabaseConfigured } from '../lib/supabase'
 
 export default function AdminLogin() {
   const navigate = useNavigate()
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
   // Already logged in? Redirect to dashboard
   useEffect(() => {
-    const token = localStorage.getItem('admin_token')
-    if (token) navigate('/admin/dashboard', { replace: true })
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate('/admin/dashboard', { replace: true })
+      }
+    })
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        navigate('/admin/dashboard', { replace: true })
+      }
+    })
+
+    return () => subscription.unsubscribe()
   }, [navigate])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!password) { setError('Please enter your password.'); return }
+    if (!email.trim()) {
+      setError('Please enter your admin email.')
+      return
+    }
+    if (!password) {
+      setError('Please enter your password.')
+      return
+    }
+
+    if (!isSupabaseConfigured) {
+      setError('Supabase credentials not configured in .env. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.')
+      return
+    }
 
     setLoading(true)
     setError('')
 
     try {
-      const res = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
       })
-      const data = await res.json()
 
-      if (!res.ok) throw new Error(data.error || 'Login failed.')
+      if (signInError) {
+        throw new Error(signInError.message || 'Invalid login credentials.')
+      }
 
-      localStorage.setItem('admin_token', data.token)
       navigate('/admin/dashboard', { replace: true })
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Login failed.')
@@ -64,7 +90,7 @@ export default function AdminLogin() {
         </div>
 
         {/* Card */}
-        <div className="border border-stroke p-8">
+        <div className="border border-stroke p-8 bg-[#FAF8F5]">
           <h1
             className="text-ink mb-1"
             style={{
@@ -81,37 +107,74 @@ export default function AdminLogin() {
           </p>
 
           <form onSubmit={handleSubmit} noValidate>
-            <label
-              htmlFor="admin-password"
-              style={{
-                display: 'block',
-                fontSize: 10,
-                letterSpacing: '0.18em',
-                textTransform: 'uppercase',
-                color: '#6E6A66',
-                marginBottom: 8,
-              }}
-            >
-              Password
-            </label>
-            <input
-              id="admin-password"
-              type="password"
-              value={password}
-              onChange={(e) => { setPassword(e.target.value); setError('') }}
-              placeholder="Enter password"
-              autoFocus
-              autoComplete="current-password"
-              className="w-full bg-transparent border border-stroke px-4 py-3 text-ink focus:outline-none focus:border-ink/40 transition-colors duration-200"
-              style={{ fontSize: 15 }}
-              aria-describedby={error ? 'login-error' : undefined}
-            />
+            {/* Email Field */}
+            <div className="mb-5">
+              <label
+                htmlFor="admin-email"
+                style={{
+                  display: 'block',
+                  fontSize: 10,
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase',
+                  color: '#6E6A66',
+                  marginBottom: 8,
+                }}
+              >
+                Admin Email
+              </label>
+              <input
+                id="admin-email"
+                type="email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value)
+                  setError('')
+                }}
+                placeholder="admin@example.com"
+                autoFocus
+                autoComplete="email"
+                className="w-full bg-transparent border border-stroke px-4 py-3 text-ink focus:outline-none focus:border-ink/40 transition-colors duration-200"
+                style={{ fontSize: 15 }}
+                aria-describedby={error ? 'login-error' : undefined}
+              />
+            </div>
+
+            {/* Password Field */}
+            <div>
+              <label
+                htmlFor="admin-password"
+                style={{
+                  display: 'block',
+                  fontSize: 10,
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase',
+                  color: '#6E6A66',
+                  marginBottom: 8,
+                }}
+              >
+                Password
+              </label>
+              <input
+                id="admin-password"
+                type="password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value)
+                  setError('')
+                }}
+                placeholder="Enter password"
+                autoComplete="current-password"
+                className="w-full bg-transparent border border-stroke px-4 py-3 text-ink focus:outline-none focus:border-ink/40 transition-colors duration-200"
+                style={{ fontSize: 15 }}
+                aria-describedby={error ? 'login-error' : undefined}
+              />
+            </div>
 
             {error && (
               <p
                 id="login-error"
                 role="alert"
-                style={{ fontSize: 12, color: '#8C7355', marginTop: 8 }}
+                style={{ fontSize: 12, color: '#8C7355', marginTop: 12 }}
               >
                 {error}
               </p>
@@ -120,7 +183,7 @@ export default function AdminLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-6 font-sans border border-ink/30 text-ink hover:bg-ink hover:text-ivory transition-all duration-250 py-3.5 inline-flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full mt-6 font-sans border border-ink/30 text-ink hover:bg-ink hover:text-ivory transition-all duration-250 py-3.5 inline-flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
               style={{ fontSize: 13, fontWeight: 500 }}
             >
               {loading ? 'Signing in…' : 'Sign In →'}

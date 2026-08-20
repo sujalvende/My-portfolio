@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { supabase, isSupabaseConfigured } from '../lib/supabase'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -83,15 +84,41 @@ export default function Contact() {
 
   const validate = () => {
     const e: Record<string, string> = {}
-    if (!form.name.trim()) e.name = 'Your name is required.'
-    if (!form.email.trim()) {
-      e.email = 'Your email address is required.'
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      e.email = 'Please enter a valid email address.'
+    const trimmedName = form.name.trim()
+    const trimmedEmail = form.email.trim()
+    const trimmedMessage = form.message.trim()
+    const trimmedPhone = form.phone.trim()
+
+    if (!trimmedName) {
+      e.name = 'Your name is required.'
+    } else if (trimmedName.length > 100) {
+      e.name = 'Name must be under 100 characters.'
     }
-    if (!form.service) e.service = 'Please select a service.'
-    if (!form.message.trim() || form.message.trim().length < 10)
+
+    if (!trimmedEmail) {
+      e.email = 'Your email address is required.'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      e.email = 'Please enter a valid email address.'
+    } else if (trimmedEmail.length > 255) {
+      e.email = 'Email must be under 255 characters.'
+    }
+
+    if (!form.service) {
+      e.service = 'Please select a service.'
+    }
+
+    if (!trimmedMessage) {
       e.message = 'Please describe your project (at least 10 characters).'
+    } else if (trimmedMessage.length < 10) {
+      e.message = 'Please describe your project with at least 10 characters.'
+    } else if (trimmedMessage.length > 3000) {
+      e.message = 'Message must be under 3,000 characters.'
+    }
+
+    if (trimmedPhone && trimmedPhone.length > 50) {
+      e.phone = 'Phone number is too long (maximum 50 characters).'
+    }
+
     return e
   }
 
@@ -114,25 +141,37 @@ export default function Contact() {
     setFormState('loading')
     setServerError('')
 
-    try {
-      const res = await fetch('/api/inquiry', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      })
-      const data = await res.json()
+    if (!isSupabaseConfigured) {
+      setFormState('error')
+      setServerError(
+        'Supabase is not configured yet. Please provide valid VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.',
+      )
+      return
+    }
 
-      if (!res.ok) {
-        const msg =
-          data.errors?.join(' ') || data.error || 'Something went wrong. Please try again.'
-        throw new Error(msg)
+    try {
+      const { error: insertError } = await supabase.from('inquiries').insert([
+        {
+          name: form.name.trim(),
+          email: form.email.trim().toLowerCase(),
+          phone: form.phone.trim() || null,
+          service: form.service,
+          budget: form.budget || null,
+          message: form.message.trim(),
+          status: 'new',
+        },
+      ])
+
+      if (insertError) {
+        throw new Error(insertError.message || 'Failed to submit inquiry. Please try again.')
       }
 
       setFormState('success')
       setForm({ name: '', email: '', phone: '', service: '', budget: '', message: '' })
+      setErrors({})
     } catch (err: unknown) {
       setFormState('error')
-      setServerError(err instanceof Error ? err.message : 'Something went wrong.')
+      setServerError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
     }
   }
 

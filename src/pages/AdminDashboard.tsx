@@ -1,37 +1,30 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { supabase, isSupabaseConfigured, type Inquiry, type InquiryStatus } from '../lib/supabase'
 
-// ── Types ──────────────────────────────────────────────────────────────────
-type Status = 'New' | 'Contacted' | 'In Progress' | 'Closed'
-
-interface Inquiry {
-  id: string
-  name: string
-  email: string
-  phone: string
-  service: string
-  budget: string
-  message: string
-  status: Status
-  createdAt: string
+// ── Status Display Mapping ──────────────────────────────────────────────────
+const STATUS_LABELS: Record<InquiryStatus, string> = {
+  new: 'NEW',
+  contacted: 'CONTACTED',
+  in_progress: 'IN PROGRESS',
+  closed: 'CLOSED',
 }
 
-// ── Status Chips ────────────────────────────────────────────────────────────
-const STATUS_COLORS: Record<Status, string> = {
-  New: '#8C7355',           // bronze
-  Contacted: '#3D6B5A',     // muted emerald
-  'In Progress': '#2A5A8C', // muted slate blue
-  Closed: '#6E6A66',        // muted grey
+const STATUS_COLORS: Record<InquiryStatus, string> = {
+  new: '#8C7355',           // bronze
+  contacted: '#3D6B5A',     // muted emerald
+  in_progress: '#2A5A8C',   // muted slate blue
+  closed: '#6E6A66',        // muted grey
 }
 
-const STATUS_BG: Record<Status, string> = {
-  New: 'rgba(140,115,85,0.12)',
-  Contacted: 'rgba(61,107,90,0.12)',
-  'In Progress': 'rgba(42,90,140,0.12)',
-  Closed: 'rgba(110,106,102,0.1)',
+const STATUS_BG: Record<InquiryStatus, string> = {
+  new: 'rgba(140,115,85,0.12)',
+  contacted: 'rgba(61,107,90,0.12)',
+  in_progress: 'rgba(42,90,140,0.12)',
+  closed: 'rgba(110,106,102,0.1)',
 }
 
-function StatusBadge({ status }: { status: Status }) {
+function StatusBadge({ status }: { status: InquiryStatus }) {
   return (
     <span
       style={{
@@ -47,7 +40,7 @@ function StatusBadge({ status }: { status: Status }) {
         borderRadius: 2,
       }}
     >
-      {status}
+      {STATUS_LABELS[status] || status}
     </span>
   )
 }
@@ -64,7 +57,7 @@ function formatDate(iso: string) {
   }
 }
 
-// ── Restored Compact Inquiry Card ──────────────────────────────────────────
+// ── Compact Inquiry Card ───────────────────────────────────────────────────
 function InquiryCard({
   inquiry,
   onStatusChange,
@@ -73,7 +66,7 @@ function InquiryCard({
   onToggle,
 }: {
   inquiry: Inquiry
-  onStatusChange: (id: string, status: Status) => void
+  onStatusChange: (id: string, status: InquiryStatus) => void
   onDelete: (id: string) => void
   expanded: boolean
   onToggle: () => void
@@ -100,7 +93,7 @@ function InquiryCard({
       <button
         type="button"
         onClick={onToggle}
-        className="w-full text-left"
+        className="w-full text-left cursor-pointer"
         style={{
           padding: '16px 20px',
           display: 'grid',
@@ -109,7 +102,6 @@ function InquiryCard({
           alignItems: 'center',
           background: 'none',
           border: 'none',
-          cursor: 'pointer',
         }}
       >
         <div
@@ -122,29 +114,66 @@ function InquiryCard({
         >
           {/* Name + Service */}
           <div>
-            <p style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 500, color: '#0D0C0B', margin: '0 0 2px' }}>
+            <p
+              style={{
+                fontFamily: "'DM Sans', system-ui, sans-serif",
+                fontSize: 14,
+                fontWeight: 500,
+                color: '#0D0C0B',
+                margin: '0 0 2px',
+              }}
+            >
               {inquiry.name}
             </p>
-            <p style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 11, color: '#6E6A66', letterSpacing: '0.04em', margin: 0 }}>
+            <p
+              style={{
+                fontFamily: "'DM Sans', system-ui, sans-serif",
+                fontSize: 11,
+                color: '#6E6A66',
+                letterSpacing: '0.04em',
+                margin: 0,
+              }}
+            >
               {inquiry.service}
             </p>
           </div>
 
           {/* Email / Phone */}
           <div>
-            <p style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 12, color: '#3D3937', margin: 0 }}>
+            <p
+              style={{
+                fontFamily: "'DM Sans', system-ui, sans-serif",
+                fontSize: 12,
+                color: '#3D3937',
+                margin: 0,
+              }}
+            >
               {inquiry.email}
             </p>
             {inquiry.phone && (
-              <p style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 11, color: '#8C7355', margin: '2px 0 0' }}>
+              <p
+                style={{
+                  fontFamily: "'DM Sans', system-ui, sans-serif",
+                  fontSize: 11,
+                  color: '#8C7355',
+                  margin: '2px 0 0',
+                }}
+              >
                 {inquiry.phone}
               </p>
             )}
           </div>
 
           {/* Date */}
-          <p style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 11, color: '#6E6A66', margin: 0 }}>
-            {formatDate(inquiry.createdAt)}
+          <p
+            style={{
+              fontFamily: "'DM Sans', system-ui, sans-serif",
+              fontSize: 11,
+              color: '#6E6A66',
+              margin: 0,
+            }}
+          >
+            {formatDate(inquiry.created_at)}
           </p>
         </div>
 
@@ -170,10 +199,28 @@ function InquiryCard({
         <div style={{ borderTop: '1px solid #E3DDD7', padding: '20px' }}>
           {/* Message */}
           <div style={{ marginBottom: 18 }}>
-            <p style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#6E6A66', margin: '0 0 8px' }}>
+            <p
+              style={{
+                fontFamily: "'DM Sans', system-ui, sans-serif",
+                fontSize: 10,
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase',
+                color: '#6E6A66',
+                margin: '0 0 8px',
+              }}
+            >
               Message
             </p>
-            <p style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, color: '#3D3937', lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap' }}>
+            <p
+              style={{
+                fontFamily: "'DM Sans', system-ui, sans-serif",
+                fontSize: 14,
+                color: '#3D3937',
+                lineHeight: 1.7,
+                margin: 0,
+                whiteSpace: 'pre-wrap',
+              }}
+            >
               {inquiry.message}
             </p>
           </div>
@@ -191,27 +238,77 @@ function InquiryCard({
           >
             {inquiry.phone && (
               <div>
-                <p style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#6E6A66', margin: '0 0 4px' }}>
+                <p
+                  style={{
+                    fontFamily: "'DM Sans', system-ui, sans-serif",
+                    fontSize: 10,
+                    letterSpacing: '0.16em',
+                    textTransform: 'uppercase',
+                    color: '#6E6A66',
+                    margin: '0 0 4px',
+                  }}
+                >
                   Phone
                 </p>
-                <a href={`tel:${inquiry.phone}`} style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 13, color: '#0D0C0B', textDecoration: 'none' }}>
+                <a
+                  href={`tel:${inquiry.phone}`}
+                  style={{
+                    fontFamily: "'DM Sans', system-ui, sans-serif",
+                    fontSize: 13,
+                    color: '#0D0C0B',
+                    textDecoration: 'none',
+                  }}
+                >
                   {inquiry.phone}
                 </a>
               </div>
             )}
             <div>
-              <p style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#6E6A66', margin: '0 0 4px' }}>
+              <p
+                style={{
+                  fontFamily: "'DM Sans', system-ui, sans-serif",
+                  fontSize: 10,
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  color: '#6E6A66',
+                  margin: '0 0 4px',
+                }}
+              >
                 Budget
               </p>
-              <p style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 13, color: '#0D0C0B', margin: 0 }}>
+              <p
+                style={{
+                  fontFamily: "'DM Sans', system-ui, sans-serif",
+                  fontSize: 13,
+                  color: '#0D0C0B',
+                  margin: 0,
+                }}
+              >
                 {inquiry.budget || 'Not specified'}
               </p>
             </div>
             <div>
-              <p style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#6E6A66', margin: '0 0 4px' }}>
+              <p
+                style={{
+                  fontFamily: "'DM Sans', system-ui, sans-serif",
+                  fontSize: 10,
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  color: '#6E6A66',
+                  margin: '0 0 4px',
+                }}
+              >
                 Email Direct
               </p>
-              <a href={`mailto:${inquiry.email}`} style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 13, color: '#0D0C0B', textDecoration: 'none' }}>
+              <a
+                href={`mailto:${inquiry.email}`}
+                style={{
+                  fontFamily: "'DM Sans', system-ui, sans-serif",
+                  fontSize: 13,
+                  color: '#0D0C0B',
+                  textDecoration: 'none',
+                }}
+              >
                 {inquiry.email}
               </a>
             </div>
@@ -220,12 +317,20 @@ function InquiryCard({
           {/* Action Row */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <label style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#6E6A66' }}>
+              <label
+                style={{
+                  fontFamily: "'DM Sans', system-ui, sans-serif",
+                  fontSize: 10,
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  color: '#6E6A66',
+                }}
+              >
                 Status
               </label>
               <select
                 value={inquiry.status}
-                onChange={(e) => onStatusChange(inquiry.id, e.target.value as Status)}
+                onChange={(e) => onStatusChange(inquiry.id, e.target.value as InquiryStatus)}
                 style={{
                   fontFamily: "'DM Sans', system-ui, sans-serif",
                   fontSize: 12,
@@ -237,9 +342,9 @@ function InquiryCard({
                   cursor: 'pointer',
                 }}
               >
-                {(['New', 'Contacted', 'In Progress', 'Closed'] as Status[]).map((s) => (
+                {(['new', 'contacted', 'in_progress', 'closed'] as InquiryStatus[]).map((s) => (
                   <option key={s} value={s}>
-                    {s}
+                    {STATUS_LABELS[s]}
                   </option>
                 ))}
               </select>
@@ -292,13 +397,12 @@ export default function AdminDashboard() {
   const [inquiries, setInquiries] = useState<Inquiry[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [unauthorizedUserId, setUnauthorizedUserId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
-  const [filterStatus, setFilterStatus] = useState<Status | 'All'>('All')
+  const [filterStatus, setFilterStatus] = useState<InquiryStatus | 'all'>('all')
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest')
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
-
-  const token = localStorage.getItem('admin_token')
 
   const showToast = (msg: string) => {
     setToastMessage(msg)
@@ -307,96 +411,137 @@ export default function AdminDashboard() {
     }, 2500)
   }
 
+  const logout = useCallback(async () => {
+    try {
+      await supabase.auth.signOut()
+    } catch {
+      // ignore
+    }
+    navigate('/admin', { replace: true })
+  }, [navigate])
+
   const fetchInquiries = useCallback(async () => {
-    if (!token) {
-      navigate('/admin', { replace: true })
+    if (!isSupabaseConfigured) {
+      setError('Supabase is not configured yet. Please provide valid credentials in .env.')
+      setLoading(false)
       return
     }
+
     try {
-      const res = await fetch('/api/inquiries', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (res.status === 401) {
-        logout()
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (!session) {
+        navigate('/admin', { replace: true })
         return
       }
-      if (!res.ok) throw new Error('Failed to load inquiries.')
-      const data: Inquiry[] = await res.json()
-      setInquiries(data)
+
+      // Check if user exists in admin_users table
+      const { data: adminCheck, error: adminCheckError } = await supabase
+        .from('admin_users')
+        .select('user_id')
+        .eq('user_id', session.user.id)
+        .maybeSingle()
+
+      if (adminCheckError || !adminCheck) {
+        setUnauthorizedUserId(session.user.id)
+        setError(
+          'Your account is authenticated, but not authorized in the admin_users table. Please run the SQL snippet in Supabase to grant access.',
+        )
+      } else {
+        setUnauthorizedUserId(null)
+        setError('')
+      }
+
+      // Fetch inquiries via Supabase (PostgreSQL RLS ensures access)
+      const { data, error: fetchError } = await supabase
+        .from('inquiries')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (fetchError) {
+        throw new Error(fetchError.message)
+      }
+
+      setInquiries(data || [])
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Error loading data.')
+      setError(err instanceof Error ? err.message : 'Error loading inquiries.')
     } finally {
       setLoading(false)
     }
-  }, [token, navigate])
+  }, [navigate])
 
   useEffect(() => {
-    if (!token) {
-      navigate('/admin', { replace: true })
-      return
-    }
-    fetchInquiries()
-  }, [fetchInquiries, navigate, token])
-
-  const logout = () => {
-    localStorage.removeItem('admin_token')
-    navigate('/admin', { replace: true })
-  }
-
-  const handleStatusChange = async (id: string, status: Status) => {
-    // Optimistic local update
-    setInquiries((prev) => prev.map((i) => (i.id === id ? { ...i, status } : i)))
-    showToast(`Status updated to ${status}`)
-
-    try {
-      const res = await fetch(`/api/inquiries/${id}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ status }),
-      })
-      if (res.status === 401) {
-        logout()
-        return
-      }
-      if (!res.ok) {
-        // Revert on failure
+    // Check session on mount and listen to changes
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        navigate('/admin', { replace: true })
+      } else {
         fetchInquiries()
       }
-    } catch {
-      fetchInquiries()
+    })
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) {
+        navigate('/admin', { replace: true })
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [fetchInquiries, navigate])
+
+  const handleStatusChange = async (id: string, status: InquiryStatus) => {
+    // Optimistic local update
+    const previous = [...inquiries]
+    setInquiries((prev) => prev.map((i) => (i.id === id ? { ...i, status } : i)))
+    showToast(`Status updated to ${STATUS_LABELS[status]}`)
+
+    try {
+      const { error: updateError } = await supabase
+        .from('inquiries')
+        .update({ status })
+        .eq('id', id)
+
+      if (updateError) {
+        throw new Error(updateError.message)
+      }
+    } catch (err: unknown) {
+      // Revert on failure
+      setInquiries(previous)
+      showToast(err instanceof Error ? `Failed: ${err.message}` : 'Failed to update status')
     }
   }
 
   const handleDelete = async (id: string) => {
     // Immediate local removal
+    const previous = [...inquiries]
     setInquiries((prev) => prev.filter((i) => i.id !== id))
     if (expandedId === id) setExpandedId(null)
     showToast('Inquiry deleted')
 
     try {
-      const res = await fetch(`/api/inquiries/${id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (res.status === 401) {
-        logout()
-        return
+      const { error: deleteError } = await supabase
+        .from('inquiries')
+        .delete()
+        .eq('id', id)
+
+      if (deleteError) {
+        throw new Error(deleteError.message)
       }
-      if (!res.ok) {
-        fetchInquiries()
-      }
-    } catch {
-      fetchInquiries()
+    } catch (err: unknown) {
+      // Revert on failure
+      setInquiries(previous)
+      showToast(err instanceof Error ? `Failed: ${err.message}` : 'Failed to delete inquiry')
     }
   }
 
   // Filter + search + sort (newest inquiries first by default)
   const filtered = inquiries
     .filter((i) => {
-      if (filterStatus !== 'All' && i.status !== filterStatus) return false
+      if (filterStatus !== 'all' && i.status !== filterStatus) return false
       if (search) {
         const q = search.toLowerCase()
         return (
@@ -409,21 +554,31 @@ export default function AdminDashboard() {
       return true
     })
     .sort((a, b) => {
-      const diff = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      const diff = new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       return sortOrder === 'newest' ? diff : -diff
     })
 
   const total = inquiries.length
-  const countNew = inquiries.filter((i) => i.status === 'New').length
-  const countContacted = inquiries.filter((i) => i.status === 'Contacted').length
+  const countNew = inquiries.filter((i) => i.status === 'new').length
+  const countContacted = inquiries.filter((i) => i.status === 'contacted').length
 
   const sans = "'DM Sans', system-ui, sans-serif"
   const serif = "'Playfair Display', Georgia, serif"
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', background: '#F9F7F4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ fontFamily: sans, fontSize: 13, color: '#6E6A66', letterSpacing: '0.1em' }}>Loading…</p>
+      <div
+        style={{
+          minHeight: '100vh',
+          background: '#F9F7F4',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <p style={{ fontFamily: sans, fontSize: 13, color: '#6E6A66', letterSpacing: '0.1em' }}>
+          Loading…
+        </p>
       </div>
     )
   }
@@ -446,7 +601,6 @@ export default function AdminDashboard() {
             letterSpacing: '0.04em',
             zIndex: 100,
             boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
-            animation: 'fadeIn 0.2s ease-out',
           }}
         >
           ✓ {toastMessage}
@@ -454,14 +608,52 @@ export default function AdminDashboard() {
       )}
 
       {/* ── Compact Admin Header: Sujal Vende | Admin | Visit Site ↗ | Log Out ── */}
-      <header style={{ borderBottom: '1px solid #E3DDD7', background: '#F9F7F4', position: 'sticky', top: 0, zIndex: 50 }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <header
+        style={{
+          borderBottom: '1px solid #E3DDD7',
+          background: '#F9F7F4',
+          position: 'sticky',
+          top: 0,
+          zIndex: 50,
+        }}
+      >
+        <div
+          style={{
+            maxWidth: 1100,
+            margin: '0 auto',
+            padding: '0 24px',
+            height: 60,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <a href="/" style={{ fontFamily: sans, fontSize: 13, fontWeight: 500, color: '#0D0C0B', textDecoration: 'none', letterSpacing: '0.04em' }}>
+            <a
+              href="/"
+              style={{
+                fontFamily: sans,
+                fontSize: 13,
+                fontWeight: 500,
+                color: '#0D0C0B',
+                textDecoration: 'none',
+                letterSpacing: '0.04em',
+              }}
+            >
               Sujal Vende
             </a>
-            <span style={{ width: 1, height: 16, background: '#E3DDD7', display: 'inline-block' }} />
-            <span style={{ fontFamily: sans, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#6E6A66' }}>
+            <span
+              style={{ width: 1, height: 16, background: '#E3DDD7', display: 'inline-block' }}
+            />
+            <span
+              style={{
+                fontFamily: sans,
+                fontSize: 10,
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+                color: '#6E6A66',
+              }}
+            >
               Admin Dashboard
             </span>
           </div>
@@ -489,7 +681,15 @@ export default function AdminDashboard() {
             <button
               type="button"
               onClick={logout}
-              style={{ fontFamily: sans, fontSize: 12, color: '#6E6A66', background: 'none', border: '1px solid #E3DDD7', padding: '6px 14px', cursor: 'pointer' }}
+              style={{
+                fontFamily: sans,
+                fontSize: 12,
+                color: '#6E6A66',
+                background: 'none',
+                border: '1px solid #E3DDD7',
+                padding: '6px 14px',
+                cursor: 'pointer',
+              }}
             >
               Log Out
             </button>
@@ -501,28 +701,73 @@ export default function AdminDashboard() {
       <main style={{ maxWidth: 1100, margin: '0 auto', padding: '36px 24px 80px' }}>
         {/* Page title with inquiries count */}
         <div style={{ marginBottom: 28 }}>
-          <h1 style={{ fontFamily: serif, fontSize: 32, color: '#0D0C0B', lineHeight: 1.15, margin: '0 0 8px' }}>
+          <h1
+            style={{
+              fontFamily: serif,
+              fontSize: 32,
+              color: '#0D0C0B',
+              lineHeight: 1.15,
+              margin: '0 0 8px',
+            }}
+          >
             Inquiries
           </h1>
           <p style={{ fontFamily: sans, fontSize: 13, color: '#6E6A66', margin: 0 }}>
             {total} {total === 1 ? 'inquiry' : 'inquiries'}
             {countNew > 0 && (
-              <> · <span style={{ color: '#8C7355', fontWeight: 600 }}>{countNew} new</span></>
+              <>
+                {' '}
+                · <span style={{ color: '#8C7355', fontWeight: 600 }}>{countNew} new</span>
+              </>
             )}
-            {countContacted > 0 && (
-              <> · {countContacted} contacted</>
-            )}
+            {countContacted > 0 && <> · {countContacted} contacted</>}
           </p>
         </div>
 
+        {/* Error Banner */}
         {error && (
-          <div style={{ border: '1px solid #E3DDD7', padding: '12px 16px', marginBottom: 24, background: '#FFF8F0' }}>
-            <p style={{ fontFamily: sans, fontSize: 13, color: '#8C7355', margin: 0 }}>{error}</p>
+          <div
+            style={{
+              border: '1px solid #E3DDD7',
+              padding: '14px 18px',
+              marginBottom: 24,
+              background: '#FFF8F0',
+            }}
+          >
+            <p style={{ fontFamily: sans, fontSize: 13, color: '#8C7355', margin: 0, fontWeight: 500 }}>
+              {error}
+            </p>
+            {unauthorizedUserId && (
+              <div style={{ marginTop: 10, fontSize: 12, color: '#3D3937' }}>
+                <p style={{ margin: '0 0 6px' }}>Run this SQL in your Supabase SQL Editor:</p>
+                <code
+                  style={{
+                    display: 'block',
+                    padding: '8px 12px',
+                    backgroundColor: '#F3EFEA',
+                    borderRadius: 4,
+                    fontFamily: 'monospace',
+                    fontSize: 11,
+                    userSelect: 'all',
+                  }}
+                >
+                  INSERT INTO admin_users (user_id) VALUES ('{unauthorizedUserId}') ON CONFLICT DO NOTHING;
+                </code>
+              </div>
+            )}
           </div>
         )}
 
         {/* Toolbar: Search, Filter, Sort, Refresh */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 22, alignItems: 'center' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 12,
+            marginBottom: 22,
+            alignItems: 'center',
+          }}
+        >
           <input
             type="search"
             value={search}
@@ -542,7 +787,7 @@ export default function AdminDashboard() {
 
           <select
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value as Status | 'All')}
+            onChange={(e) => setFilterStatus(e.target.value as InquiryStatus | 'all')}
             style={{
               fontFamily: sans,
               fontSize: 12,
@@ -554,10 +799,10 @@ export default function AdminDashboard() {
               cursor: 'pointer',
             }}
           >
-            <option value="All">All Statuses</option>
-            {(['New', 'Contacted', 'In Progress', 'Closed'] as Status[]).map((s) => (
+            <option value="all">All Statuses</option>
+            {(['new', 'contacted', 'in_progress', 'closed'] as InquiryStatus[]).map((s) => (
               <option key={s} value={s}>
-                {s}
+                {STATUS_LABELS[s]}
               </option>
             ))}
           </select>
@@ -599,7 +844,14 @@ export default function AdminDashboard() {
 
         {/* Inquiry Card List */}
         {filtered.length === 0 ? (
-          <div style={{ border: '1px solid #E3DDD7', padding: '48px 24px', textAlign: 'center', backgroundColor: '#FDFCFB' }}>
+          <div
+            style={{
+              border: '1px solid #E3DDD7',
+              padding: '48px 24px',
+              textAlign: 'center',
+              backgroundColor: '#FDFCFB',
+            }}
+          >
             <p style={{ fontFamily: sans, fontSize: 14, color: '#6E6A66', margin: 0 }}>
               {inquiries.length === 0
                 ? 'No inquiries yet. Your form submissions will appear here.'
@@ -609,9 +861,28 @@ export default function AdminDashboard() {
         ) : (
           <div>
             {/* Column Headers */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.2fr) minmax(0,1.2fr) minmax(0,0.8fr) auto', gap: '8px 16px', padding: '0 20px 8px', alignItems: 'center' }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns:
+                  'minmax(0,1.2fr) minmax(0,1.2fr) minmax(0,0.8fr) auto',
+                gap: '8px 16px',
+                padding: '0 20px 8px',
+                alignItems: 'center',
+              }}
+            >
               {['Name / Service', 'Email / Phone', 'Date', 'Status'].map((h) => (
-                <p key={h} style={{ fontFamily: sans, fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#B8B1AA', margin: 0 }}>
+                <p
+                  key={h}
+                  style={{
+                    fontFamily: sans,
+                    fontSize: 9,
+                    letterSpacing: '0.16em',
+                    textTransform: 'uppercase',
+                    color: '#B8B1AA',
+                    margin: 0,
+                  }}
+                >
                   {h}
                 </p>
               ))}
@@ -624,7 +895,9 @@ export default function AdminDashboard() {
                 onStatusChange={handleStatusChange}
                 onDelete={handleDelete}
                 expanded={expandedId === inquiry.id}
-                onToggle={() => setExpandedId(expandedId === inquiry.id ? null : inquiry.id)}
+                onToggle={() =>
+                  setExpandedId(expandedId === inquiry.id ? null : inquiry.id)
+                }
               />
             ))}
           </div>
