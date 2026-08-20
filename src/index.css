@@ -48,25 +48,3 @@ img {
     scroll-behavior: auto !important;
   }
 }
-
-/* ── GSAP Flash Prevention ─────────────────────────────────────────────────
-   These elements are animated in by GSAP using gsap.from({opacity:0}).
-   Without this, they briefly appear at full opacity before GSAP initialises
-   on production builds (Vercel), causing visible text/layout glitch.
-   GSAP overrides these once it initialises. The prefers-reduced-motion
-   media query above resets them immediately for accessibility.
-────────────────────────────────────────────────────────────────────────── */
-.hero-reveal,
-.hero-portrait-wrap,
-.scroll-indicator {
-  opacity: 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero-reveal,
-  .hero-portrait-wrap,
-  .scroll-indicator {
-    opacity: 1;
-  }
-}
-
