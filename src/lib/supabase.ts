@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from './config'
 
 export type InquiryStatus = 'new' | 'contacted' | 'in_progress' | 'closed'
 
@@ -86,11 +87,18 @@ export interface Database {
   }
 }
 
-const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL || '').trim()
+// Prefer VITE_ env vars (set in .env locally or via Vercel dashboard),
+// but fall back to the hardcoded public config so the Vercel Free-plan
+// build succeeds without requiring environment variable configuration.
+const supabaseUrl = (
+  import.meta.env.VITE_SUPABASE_URL ||
+  SUPABASE_URL
+).trim()
+
 const supabaseAnonKey = (
   import.meta.env.VITE_SUPABASE_ANON_KEY ||
   import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-  ''
+  SUPABASE_PUBLISHABLE_KEY
 ).trim()
 
 export const isSupabaseConfigured = Boolean(
@@ -101,10 +109,10 @@ export const isSupabaseConfigured = Boolean(
     !supabaseAnonKey.includes('placeholder'),
 )
 
-// Initialize client with fallback placeholder to prevent runtime crash during initialization
+// Initialize client — always valid because we have hardcoded public fallbacks
 export const supabase = createClient<Database>(
-  supabaseUrl || 'https://placeholder.supabase.co',
-  supabaseAnonKey || 'placeholder-key',
+  supabaseUrl,
+  supabaseAnonKey,
   {
     auth: {
       persistSession: true,
