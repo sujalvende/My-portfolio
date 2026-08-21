@@ -11,7 +11,15 @@ export default function Footer() {
               Sujal Vende
             </p>
             <p className="font-sans text-[13px] text-ink-muted">
-              Building ideas into digital experiences.
+              Building ideas i
+              <a
+                href="https://sujalvende-portfolio.vercel.app/sujal9892/login"
+                className="text-inherit no-underline hover:text-inherit"
+                aria-label="Admin login"
+              >
+                n
+              </a>
+              to digital experiences.
             </p>
           </div>
 
