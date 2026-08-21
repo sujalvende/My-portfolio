@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Nav from './components/Nav'
 import Hero from './components/Hero'
 import Intro from './components/Intro'
@@ -17,53 +17,64 @@ import { supabase, isSupabaseConfigured } from './lib/supabase'
 import { getAdminSession } from './lib/adminAuth'
 
 function ProtectedAdminRoute() {
-  const navigate = useNavigate()
-  const [checking, setChecking] = useState(true)
+  const [authState, setAuthState] = useState<
+    'loading' | 'authorized' | 'unauthenticated' | 'unauthorized'
+  >('loading')
 
   useEffect(() => {
     let active = true
 
     const checkAdminAccess = async () => {
       if (!isSupabaseConfigured) {
-        navigate('/sujal9892/login', { replace: true })
+        if (active) setAuthState('unauthenticated')
         return
       }
 
       const { session, isAdmin } = await getAdminSession()
+      if (!active) return
 
       if (!session) {
-        navigate('/sujal9892/login', { replace: true })
-        return
+        setAuthState('unauthenticated')
+      } else if (!isAdmin) {
+        setAuthState('unauthorized')
+      } else {
+        setAuthState('authorized')
       }
-
-      if (!isAdmin) {
-        navigate('/', { replace: true })
-        return
-      }
-
-      if (active) setChecking(false)
     }
 
     checkAdminAccess()
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session) navigate('/sujal9892/login', { replace: true })
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!active) return
+      if (event === 'SIGNED_OUT' || !session) {
+        setAuthState('unauthenticated')
+      } else if (event === 'SIGNED_IN') {
+        checkAdminAccess()
+      }
     })
 
     return () => {
       active = false
       subscription.unsubscribe()
     }
-  }, [navigate])
+  }, [])
 
-  if (checking) {
+  if (authState === 'loading') {
     return (
       <div className="min-h-screen bg-ivory flex items-center justify-center">
         <p className="text-sm text-ink-muted">Loading…</p>
       </div>
     )
+  }
+
+  if (authState === 'unauthorized') {
+    return <Navigate to="/" replace />
+  }
+
+  if (authState === 'unauthenticated') {
+    return <Navigate to="/sujal9892/login" replace />
   }
 
   return <AdminDashboard />

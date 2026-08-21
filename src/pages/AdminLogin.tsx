@@ -9,13 +9,22 @@ export default function AdminLogin() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [checkingSession, setCheckingSession] = useState(true)
 
   useEffect(() => {
     let active = true
 
     getAdminSession().then(({ session, isAdmin }) => {
-      if (active && session && isAdmin) {
-        navigate('/sujal9892/dashboard', { replace: true })
+      if (active) {
+        if (session && isAdmin) {
+          navigate('/sujal9892/dashboard', { replace: true })
+          return
+        }
+        setCheckingSession(false)
+      }
+    }).catch(() => {
+      if (active) {
+        setCheckingSession(false)
       }
     })
 
@@ -44,13 +53,28 @@ export default function AdminLogin() {
     setError('')
 
     try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
       })
 
       if (signInError) {
         throw new Error(signInError.message || 'Invalid login credentials.')
+      }
+
+      if (!signInData.user) {
+        throw new Error('Authentication failed.')
+      }
+
+      const { data: adminUser, error: adminError } = await supabase
+        .from('admin_users')
+        .select('user_id')
+        .eq('user_id', signInData.user.id)
+        .maybeSingle()
+
+      if (adminError || !adminUser) {
+        await supabase.auth.signOut({ scope: 'local' })
+        throw new Error('Access denied. You are not authorized as an administrator.')
       }
 
       navigate('/sujal9892/dashboard', { replace: true })
@@ -60,6 +84,14 @@ export default function AdminLogin() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (checkingSession) {
+    return (
+      <div className="min-h-screen bg-ivory flex items-center justify-center">
+        <p className="text-sm text-ink-muted">Loading…</p>
+      </div>
+    )
   }
 
   return (
