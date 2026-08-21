@@ -13,7 +13,7 @@ export default function AdminLogin() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate('/admin/dashboard', { replace: true })
+        navigate('/sujal9892/dashboard', { replace: true })
       }
     })
 
@@ -21,7 +21,7 @@ export default function AdminLogin() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
-        navigate('/admin/dashboard', { replace: true })
+        navigate('/sujal9892/dashboard', { replace: true })
       }
     })
 
@@ -57,7 +57,7 @@ export default function AdminLogin() {
         throw new Error(signInError.message || 'Invalid login credentials.')
       }
 
-      navigate('/admin/dashboard', { replace: true })
+      navigate('/sujal9892/dashboard', { replace: true })
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Login failed.')
       setPassword('')

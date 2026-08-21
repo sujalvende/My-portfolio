@@ -11,7 +11,7 @@ const prefersReducedMotion =
 
 export default function Cursor() {
   const location = useLocation()
-  const isAdmin = location.pathname.startsWith('/admin')
+  const isAdmin = location.pathname.startsWith('/sujal9892')
 
   const dotRef = useRef<HTMLDivElement>(null)
   const ringRef = useRef<HTMLDivElement>(null)

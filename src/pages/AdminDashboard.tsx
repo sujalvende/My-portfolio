@@ -382,7 +382,6 @@ export default function AdminDashboard() {
   const [inquiries, setInquiries] = useState<Inquiry[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [unauthorizedUserId, setUnauthorizedUserId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState<InquiryStatus | 'all'>('all')
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest')
@@ -402,7 +401,7 @@ export default function AdminDashboard() {
     } catch {
       // ignore
     }
-    navigate('/admin', { replace: true })
+    navigate('/sujal9892/login', { replace: true })
   }, [navigate])
 
   const fetchInquiries = useCallback(async () => {
@@ -413,33 +412,6 @@ export default function AdminDashboard() {
     }
 
     try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-
-      if (!session) {
-        navigate('/admin', { replace: true })
-        return
-      }
-
-      // Check if user exists in admin_users table
-      const { data: adminCheck, error: adminCheckError } = await supabase
-        .from('admin_users')
-        .select('user_id')
-        .eq('user_id', session.user.id)
-        .maybeSingle()
-
-      if (adminCheckError || !adminCheck) {
-        setUnauthorizedUserId(session.user.id)
-        setError(
-          'Your account is authenticated, but not authorized in the admin_users table. Please run the SQL snippet in Supabase to grant access.',
-        )
-      } else {
-        setUnauthorizedUserId(null)
-        setError('')
-      }
-
-      // Fetch inquiries via Supabase (PostgreSQL RLS ensures access)
       const { data, error: fetchError } = await supabase
         .from('inquiries')
         .select('*')
@@ -455,28 +427,11 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false)
     }
-  }, [navigate])
+  }, [])
 
   useEffect(() => {
-    // Check session on mount and listen to changes
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        navigate('/admin', { replace: true })
-      } else {
-        fetchInquiries()
-      }
-    })
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session) {
-        navigate('/admin', { replace: true })
-      }
-    })
-
-    return () => subscription.unsubscribe()
-  }, [fetchInquiries, navigate])
+    fetchInquiries()
+  }, [fetchInquiries])
 
   const handleStatusChange = async (id: string, status: InquiryStatus) => {
     // Optimistic local update
@@ -729,25 +684,6 @@ export default function AdminDashboard() {
             <p style={{ fontFamily: sans, fontSize: 13, color: '#8C7355', margin: 0, fontWeight: 500 }}>
               {error}
             </p>
-            {unauthorizedUserId && (
-              <div style={{ marginTop: 10, fontSize: 12, color: '#3D3937' }}>
-                <p style={{ margin: '0 0 6px' }}>Run this SQL in your Supabase SQL Editor:</p>
-                <code
-                  style={{
-                    display: 'block',
-                    padding: '8px 12px',
-                    backgroundColor: '#F3EFEA',
-                    borderRadius: 4,
-                    fontFamily: 'monospace',
-                    fontSize: 11,
-                    userSelect: 'all',
-                    wordBreak: 'break-all',
-                  }}
-                >
-                  INSERT INTO admin_users (user_id) VALUES ('{unauthorizedUserId}') ON CONFLICT DO NOTHING;
-                </code>
-              </div>
-            )}
           </div>
         )}
 
