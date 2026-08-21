@@ -547,7 +547,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* ── Compact Admin Header: Sujal Vende | Admin | Visit Site ↗ | Log Out ── */}
+      {/* ── Compact Admin Header: Sujal Vende | Admin | Log Out ── */}
       <header
         style={{
           borderBottom: '1px solid #E3DDD7',
@@ -604,26 +604,6 @@ export default function AdminDashboard() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-            <a
-              href="/"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                fontFamily: sans,
-                fontSize: 12,
-                color: '#0D0C0B',
-                border: '1px solid #E3DDD7',
-                padding: '6px 12px',
-                textDecoration: 'none',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4,
-                whiteSpace: 'nowrap',
-              }}
-            >
-              Visit Site ↗
-            </a>
-
             <button
               type="button"
               onClick={logout}
