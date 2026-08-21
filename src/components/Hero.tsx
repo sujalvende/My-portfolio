@@ -159,7 +159,7 @@ export default function Hero() {
           </p>
 
           {/* CTAs */}
-          <div ref={ctaRef} className="hero-cta-wrap hero-reveal flex flex-wrap items-center gap-5">
+          <div ref={ctaRef} className="hero-cta-wrap flex flex-wrap items-center gap-5">
             <a
               href="#work"
               className="font-sans text-ink border border-ink/30 hover:border-ink hover:bg-ink hover:text-ivory inline-flex items-center gap-2.5 transition-all duration-250"
@@ -275,7 +275,7 @@ export default function Hero() {
             creators, and ideas that deserve to exist online.
           </p>
           {/* CTAs — flex-wrap so they never overflow on 320px */}
-          <div className="hero-cta-wrap hero-reveal flex flex-wrap items-center gap-3">
+          <div className="hero-cta-wrap flex flex-wrap items-center gap-3">
             <a
               href="#work"
               className="font-sans text-ivory bg-ink border border-ink hover:bg-ink-mid hover:border-ink-mid transition-all duration-200 inline-flex items-center gap-2"

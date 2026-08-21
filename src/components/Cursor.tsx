@@ -69,7 +69,7 @@ export default function Cursor() {
       const dataCursor = closest.getAttribute('data-cursor')
       if (dataCursor === 'project') {
         setCursorState('project')
-        setLabel('VIEW ↗')
+        setLabel('OPEN ↗')
       } else if (dataCursor === 'talk') {
         setCursorState('talk')
         setLabel('TALK ↗')

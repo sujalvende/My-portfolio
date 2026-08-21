@@ -8,61 +8,43 @@ const projects = [
   {
     number: '01',
     title: 'OSD Coaching Classes',
+    posterTitle: ['OSD', 'COACHING'],
     url: 'https://osd-couching-classes.vercel.app',
-    description:
-      'A professional coaching-class website designed to present information clearly, build trust with students and parents, and create a strong online presence for a growing educational institution.',
-    tags: ['Web Design', 'Development', '2026'],
-    built: [
-      'Responsive interface across all devices',
-      'Clear information architecture',
-      'Trust-building design for parents & students',
-      'Performance-optimised frontend',
-    ],
-    image:
-      'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=1400&h=900&fit=crop&auto=format&q=80',
-    imageAlt: 'Study environment with books and warm lighting',
+    meta: 'WEB DEVELOPMENT · DESIGN',
+    description: 'A professional digital presence for a coaching business, designed to make information clearer and build trust online.',
+    image: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1400&h=900&fit=crop&auto=format&q=80',
+    imageAlt: 'Students in a focused classroom session at Om Sai Datta Classes',
+    theme: 'bg-[#DCE4DE]',
   },
   {
     number: '02',
     title: 'Skill Bridge',
+    posterTitle: ['SKILL', 'BRIDGE'],
     url: 'https://skill-bridge-prototype.vercel.app',
-    description:
-      'A learning and career-oriented web experience focused on connecting users with useful skills and opportunities through a clean, accessible, and purposeful interface.',
-    tags: ['Web Application', 'UI / UX', '2026'],
-    built: [
-      'Intuitive navigation and user flows',
-      'Accessible, responsive frontend',
-      'Clean component structure',
-      'Focused user experience design',
-    ],
-    image:
-      'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1400&h=900&fit=crop&auto=format&q=80',
-    imageAlt: 'Laptop with code on screen in a clean workspace',
+    meta: 'WEB DEVELOPMENT · DIGITAL EXPERIENCE',
+    description: 'A learning-focused digital experience built around making opportunities and skills easier to discover and use.',
+    image: 'https://images.unsplash.com/photo-1580894732930-0babd100d356?w=1400&h=900&fit=crop&auto=format&q=80',
+    imageAlt: 'Learner using the Skill Bridge learning experience',
+    theme: 'bg-[#DDE2EC]',
   },
 ]
 
 export default function Work() {
   const sectionRef = useRef<HTMLElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
-  const pinWrapperRef = useRef<HTMLDivElement>(null)
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([])
+  const desktopCardsRef = useRef<(HTMLDivElement | null)[]>([])
+  const mobileCardsRef = useRef<(HTMLDivElement | null)[]>([])
   const [activeIdx, setActiveIdx] = useState(0)
 
-  // ── Unified Master Timeline with Depth-of-Field Blur (No Darkening) ───────
   useEffect(() => {
     const section = sectionRef.current
-    const pinWrapper = pinWrapperRef.current
-    if (!section || !pinWrapper) return
+    if (!section) return
 
-    const isMobile = window.innerWidth < 1024
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-    if (isMobile || reducedMotion) return
-
-    const cards = cardsRef.current.filter(Boolean) as HTMLDivElement[]
+    const isMobile = window.matchMedia('(max-width: 1023px)').matches
+    const cards = (isMobile ? mobileCardsRef : desktopCardsRef).current.filter(Boolean) as HTMLDivElement[]
 
     const ctx = gsap.context(() => {
-      // Header entrance
       if (headerRef.current) {
         gsap.from(headerRef.current.querySelectorAll('.work-header-reveal'), {
           y: 28,
@@ -70,79 +52,41 @@ export default function Work() {
           duration: 0.85,
           stagger: 0.1,
           ease: 'power2.out',
-          scrollTrigger: {
-            trigger: headerRef.current,
-            start: 'top 85%',
-          },
+          scrollTrigger: { trigger: headerRef.current, start: 'top 85%' },
         })
       }
 
-      // Master Pinned Timeline
-      const totalScroll = window.innerHeight * 1.35 * (projects.length - 1)
+      if (reducedMotion || isMobile || cards.length < 2) return
 
-      const tl = gsap.timeline({
+      const totalScroll = isMobile ? window.innerHeight * 0.9 : window.innerHeight * 1.35
+      const stage = section.querySelector(isMobile ? '.work-mobile-stage' : '.work-desktop-stage')
+      if (!stage) return
+
+      cards.forEach((card, index) => {
+        gsap.set(card, { yPercent: index === 0 ? 0 : 112 })
+      })
+
+      const timeline = gsap.timeline({
         scrollTrigger: {
-          trigger: pinWrapper,
-          start: 'center center',
-          end: `+=${totalScroll}`,
+          trigger: stage,
+          start: isMobile ? 'top 12%' : 'center center',
+          end: `+=${totalScroll * (cards.length - 1)}`,
           pin: section,
           pinSpacing: true,
           scrub: 0.8,
           anticipatePin: 1,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
-            const idx = Math.min(
-              projects.length - 1,
-              Math.floor(self.progress * projects.length * 0.999),
-            )
-            setActiveIdx(idx)
+            setActiveIdx(Math.min(cards.length - 1, Math.floor(self.progress * cards.length * 0.999)))
           },
         },
       })
 
-      // Layered Upward Stacking with Smooth Depth-of-Field Blur
-      cards.forEach((card, i) => {
-        if (i === 0) return
-
-        const stepTime = (i - 1) * 1.5
-
-        // Incoming project slides smoothly upward — always crisp and sharp
-        tl.fromTo(
-          card,
-          {
-            yPercent: 115,
-            scale: 1,
-            opacity: 1,
-            filter: 'blur(0px)',
-          },
-          {
-            yPercent: 0,
-            scale: 1,
-            opacity: 1,
-            filter: 'blur(0px)',
-            ease: 'power1.inOut',
-            duration: 1.5,
-          },
-          stepTime,
-        )
-
-        // Previous project card softly blurs (0px → 8px) — NO darkening
-        tl.fromTo(
-          cards[i - 1],
-          {
-            filter: 'blur(0px)',
-            scale: 1,
-            opacity: 1,
-          },
-          {
-            filter: 'blur(8px)',
-            scale: 0.96,
-            opacity: 0.85,
-            ease: 'power1.inOut',
-            duration: 1.5,
-          },
-          stepTime,
-        )
+      cards.forEach((card, index) => {
+        if (index === 0) return
+        const start = (index - 1) * 1.5
+        timeline.to(card, { yPercent: 0, duration: 1.5, ease: 'power1.inOut' }, start)
+        timeline.to(cards[index - 1], { filter: 'blur(7px)', scale: 0.965, opacity: 0.82, duration: 1.5, ease: 'power1.inOut' }, start)
       })
     }, section)
 
@@ -150,250 +94,75 @@ export default function Work() {
   }, [])
 
   return (
-    <section
-      ref={sectionRef}
-      id="work"
-      className="border-t border-stroke py-14 lg:py-0 lg:min-h-screen lg:flex lg:flex-col lg:justify-center bg-ivory"
-    >
+    <section ref={sectionRef} id="work" className="border-t border-stroke bg-ivory py-14 lg:py-0 lg:min-h-screen lg:flex lg:flex-col lg:justify-center">
       <div className="max-w-[1200px] w-full mx-auto px-6 md:px-10 xl:px-12">
-        {/* ── Section Header ─────────────────────────────────────────────── */}
-        <div
-          ref={headerRef}
-          className="mb-8 lg:mb-10 flex items-end justify-between"
-        >
+        <div ref={headerRef} className="mb-8 lg:mb-10 flex items-end justify-between">
           <div>
-            <span className="work-header-reveal block font-sans text-[10px] uppercase tracking-[0.22em] text-ink-muted mb-3">
-              02 / Selected Work
-            </span>
-            <h2
-              className="work-header-reveal font-serif text-ink leading-[1.12]"
-              style={{ fontSize: 'clamp(28px, 3.8vw, 46px)' }}
-            >
-              A few things I've built.
-            </h2>
+            <span className="work-header-reveal block font-sans text-[10px] uppercase tracking-[0.22em] text-ink-muted mb-3">02 / Selected Work</span>
+            <h2 className="work-header-reveal hidden lg:block font-serif text-ink leading-[1.12]" style={{ fontSize: 'clamp(28px, 3.8vw, 46px)' }}>A few things I've built.</h2>
+            <h2 className="work-header-reveal lg:hidden w-full max-w-full break-words font-serif text-[clamp(30px,8.5vw,40px)] leading-[1.05] text-ink" style={{ overflowWrap: 'break-word' }}>The work I take on.</h2>
           </div>
-
-          {/* Progress indicator */}
-          <div
-            className="hidden lg:flex items-center gap-3 font-sans text-[11px] uppercase tracking-[0.18em]"
-            aria-label={`Project ${activeIdx + 1} of ${projects.length}`}
-          >
-            {projects.map((p, i) => (
-              <span
-                key={p.number}
-                className={`transition-colors duration-300 ${
-                  i === activeIdx ? 'text-ink font-medium' : 'text-ink-muted/40'
-                }`}
-              >
-                {p.number}
-              </span>
-            ))}
+          <div className="hidden lg:flex items-center gap-3 font-sans text-[11px] uppercase tracking-[0.18em]" aria-label={`Project ${activeIdx + 1} of ${projects.length}`}>
+            {projects.map((project, index) => <span key={project.number} className={index === activeIdx ? 'text-ink font-medium' : 'text-ink-muted/40'}>{project.number}</span>)}
           </div>
         </div>
 
-        {/* ── DESKTOP: Centered Floating Cards Stage ─────────────────────── */}
-        <div
-          ref={pinWrapperRef}
-          className="hidden lg:block relative w-full h-[66vh] min-h-[520px] max-h-[640px]"
-        >
-          {projects.map((project, i) => (
-            <div
-              key={project.number}
-              ref={(el) => {
-                cardsRef.current[i] = el
-                if (el) {
-                  el.style.zIndex = String(i + 1)
-                  el.style.willChange = 'transform, filter'
-                }
-              }}
-              className="absolute inset-0 bg-[#FAF8F5] border border-stroke/90 rounded-2xl overflow-hidden shadow-[0_16px_44px_rgba(13,12,11,0.06)] grid grid-cols-[13fr_11fr] transition-[filter] duration-200"
-            >
-              {/* Left — Clickable Cover Image */}
-              <a
-                href={project.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-cursor="project"
-                className="relative block h-full w-full overflow-hidden group border-r border-stroke/60"
-                aria-label={`Open ${project.title} live demo in new tab`}
-              >
-                <img
-                  src={project.image}
-                  alt={project.imageAlt}
-                  className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-ink/0 group-hover:bg-ink/10 transition-all duration-300 flex items-end justify-end p-6">
-                  <span className="font-sans text-[11px] uppercase tracking-[0.18em] text-ivory opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-ink/80 px-3.5 py-2 rounded">
-                    View Project ↗
-                  </span>
-                </div>
-              </a>
-
-              {/* Right — Project Details */}
-              <div className="flex flex-col justify-between p-8 xl:p-10 overflow-y-auto">
-                <div>
-                  {/* Number & Subtitle */}
-                  <div className="flex items-center gap-3 mb-5">
-                    <span className="font-sans text-[10px] uppercase tracking-[0.22em] text-ink-muted">
-                      {project.number}
-                    </span>
-                    <span className="w-6 h-px bg-stroke inline-block" />
-                    <span className="font-sans text-[10px] uppercase tracking-[0.18em] text-ink-muted">
-                      Featured Project
-                    </span>
-                  </div>
-
-                  {/* Title */}
-                  <h3
-                    className="font-serif text-ink leading-[1.15] mb-4"
-                    style={{ fontSize: 'clamp(24px, 2.3vw, 34px)' }}
-                  >
-                    {project.title}
-                  </h3>
-
-                  {/* Description */}
-                  <p className="font-sans text-[14px] xl:text-[15px] text-ink-muted leading-[1.7] mb-5">
-                    {project.description}
-                  </p>
-
-                  {/* What I built */}
-                  <div className="mb-5">
-                    <p className="font-sans text-[10px] uppercase tracking-[0.18em] text-ink-muted mb-2.5">
-                      What I built
-                    </p>
-                    <ul className="space-y-1.5">
-                      {project.built.map((item) => (
-                        <li
-                          key={item}
-                          className="font-sans text-[12px] xl:text-[13px] text-ink-mid flex items-start gap-2"
-                        >
-                          <span className="text-bronze mt-px shrink-0">—</span>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                {/* Bottom Bar: Tags + Direct CTA */}
-                <div className="pt-5 border-t border-stroke/60 flex items-center justify-between gap-4">
-                  <div className="flex flex-wrap gap-2">
-                    {project.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="font-sans text-[10px] uppercase tracking-[0.16em] text-ink-muted border border-stroke px-2.5 py-1 rounded"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  <a
-                    href={project.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-sans text-[13px] font-medium text-ink hover:text-bronze transition-colors duration-200 inline-flex items-center gap-1.5 shrink-0"
-                  >
-                    View Project <span className="inline-block">↗</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="work-desktop-stage hidden lg:block relative w-full h-[66vh] min-h-[520px] max-h-[640px]">
+          {projects.map((project, index) => <PosterCard key={project.number} project={project} index={index} cardRef={(element) => { desktopCardsRef.current[index] = element }} />)}
         </div>
 
-        {/* ── MOBILE / TABLET: Refined stacked vertical cards ──────────────── */}
-        <div className="lg:hidden space-y-6">
-          {projects.map((project) => (
-            <div
-              key={project.number}
-              className="bg-[#FAF8F5] border border-stroke rounded-2xl overflow-hidden shadow-[0_8px_24px_rgba(13,12,11,0.04)]"
-            >
-              {/* Clickable Cover Image */}
-              <a
-                href={project.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block relative overflow-hidden group"
-                style={{ aspectRatio: '16/10' }}
-                aria-label={`Open ${project.title}`}
-              >
-                <img
-                  src={project.image}
-                  alt={project.imageAlt}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                  loading="lazy"
-                />
-                <span className="absolute bottom-3 right-3 font-sans text-[10px] uppercase tracking-[0.16em] text-ink bg-ivory/95 px-3 py-2">
-                  View Project ↗
-                </span>
-              </a>
-
-              {/* Content */}
-              <div className="p-6 pb-7">
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="font-sans text-[10px] uppercase tracking-[0.22em] text-ink-muted">
-                    {project.number}
-                  </span>
-                  <span className="w-5 h-px bg-stroke inline-block" />
-                  <span className="font-sans text-[10px] uppercase tracking-[0.18em] text-ink-muted">
-                    Featured Project
-                  </span>
-                </div>
-
-                <h3 className="font-serif text-[22px] text-ink mb-3 leading-[1.18]">
-                  {project.title}
-                </h3>
-
-                <p className="font-sans text-[14px] text-ink-muted leading-[1.68] mb-4">
-                  {project.description}
-                </p>
-
-                {/* What I built — restored for mobile parity with desktop */}
-                <div className="mb-5">
-                  <p className="font-sans text-[10px] uppercase tracking-[0.18em] text-ink-muted mb-2.5">
-                    What I built
-                  </p>
-                  <ul className="space-y-1.5">
-                    {project.built.map((item) => (
-                      <li
-                        key={item}
-                        className="font-sans text-[13px] text-ink-mid flex items-start gap-2"
-                      >
-                        <span className="text-bronze mt-px shrink-0">—</span>
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Tags + CTA */}
-                <div className="pt-4 border-t border-stroke/60 flex items-center justify-between gap-3 flex-wrap">
-                  <div className="flex flex-wrap gap-2">
-                    {project.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="font-sans text-[10px] uppercase tracking-[0.16em] text-ink-muted border border-stroke px-2.5 py-1 rounded"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  <a
-                    href={project.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-sans text-[13px] font-medium text-ink inline-flex items-center gap-1.5 border-b border-ink/30 pb-0.5 shrink-0"
-                  >
-                    View Project ↗
-                  </a>
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="work-mobile-stage lg:hidden relative space-y-8">
+          {projects.map((project, index) => <PosterCard key={project.number} project={project} index={index} mobile cardRef={(element) => { mobileCardsRef.current[index] = element }} />)}
         </div>
       </div>
     </section>
+  )
+}
+
+function PosterCard({ project, index, mobile = false, cardRef }: {
+  project: (typeof projects)[number]
+  index: number
+  mobile?: boolean
+  cardRef: (element: HTMLDivElement | null) => void
+}) {
+  return (
+    <div
+      ref={cardRef}
+      role="link"
+      tabIndex={0}
+      data-cursor="project"
+      aria-label={`Open ${project.title} live demo`}
+      onClick={(event) => {
+        if ((event.target as HTMLElement).closest('a')) return
+        window.open(project.url, '_blank', 'noopener,noreferrer')
+      }}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          window.open(project.url, '_blank', 'noopener,noreferrer')
+        }
+      }}
+      className={`${mobile ? 'relative min-h-[680px] w-full' : 'absolute inset-0'} ${project.theme} overflow-hidden rounded-[22px] border border-ink/10 shadow-[0_22px_55px_rgba(13,12,11,0.12)]`}
+      style={{ zIndex: index + 1, willChange: 'transform, filter' }}
+    >
+      <div className={`${mobile ? 'relative min-h-[680px] p-6' : 'absolute inset-0 p-6 sm:p-9 lg:p-12'}`}>
+        <div className={`${mobile ? 'relative z-20 flex min-h-[632px] flex-col' : 'relative z-20 flex h-full flex-col justify-between'}`}>
+          <div className="flex items-center justify-between font-sans text-[10px] uppercase tracking-[0.2em] text-ink-mid">
+            <span>{project.meta}</span>
+            <span>{project.number}</span>
+          </div>
+          <div className={`${mobile ? 'relative z-20 mt-10 max-w-full pr-2' : 'max-w-[45%] pb-4'}`}>
+            <p className="mb-4 max-w-[280px] font-sans text-[12px] leading-[1.55] text-ink-mid/75">{project.description}</p>
+            <h3 className={`${mobile ? 'text-[clamp(44px,14vw,64px)]' : 'text-[clamp(40px,6vw,88px)]'} font-serif font-medium uppercase leading-[0.82] tracking-[-0.045em] text-ink`}>
+              {project.posterTitle.map((line) => <span key={line} className="block">{line}</span>)}
+            </h3>
+          </div>
+          <a href={project.url} target="_blank" rel="noopener noreferrer" onClick={(event) => event.stopPropagation()} className={`${mobile ? 'absolute bottom-0 left-0' : 'relative'} z-30 inline-flex min-h-[44px] w-fit items-center border-b border-ink/50 pb-1 font-sans text-[12px] font-medium uppercase tracking-[0.14em] text-ink hover:border-ink`} aria-label={`View ${project.title} project`}>View Project ↗</a>
+        </div>
+        <a href={project.url} target="_blank" rel="noopener noreferrer" onClick={(event) => event.stopPropagation()} className={`absolute ${mobile ? 'inset-x-6 bottom-24 h-[36%]' : index === 0 ? 'right-[5%] top-[13%] h-[72%] w-[47%]' : 'right-[7%] top-[9%] h-[76%] w-[49%]'} z-10 block overflow-hidden rounded-[14px] border border-white/50 shadow-[0_16px_35px_rgba(13,12,11,0.16)]`} aria-label={`Open ${project.title} live demo in new tab`}>
+          <img src={project.image} alt={project.imageAlt} className="h-full w-full object-cover transition-transform duration-700 hover:scale-[1.04]" loading="lazy" />
+        </a>
+      </div>
+    </div>
   )
 }
