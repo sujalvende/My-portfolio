@@ -278,7 +278,7 @@ export default function Hero() {
           <div className="hero-cta-wrap hero-reveal flex flex-wrap items-center gap-3">
             <a
               href="#work"
-              className="font-sans text-ink border border-ink/30 hover:border-ink hover:bg-ink hover:text-ivory transition-all duration-200 inline-flex items-center gap-2"
+              className="font-sans text-ivory bg-ink border border-ink hover:bg-ink-mid hover:border-ink-mid transition-all duration-200 inline-flex items-center gap-2"
               style={{ fontSize: 13, fontWeight: 500, padding: '13px 22px', minHeight: 44 }}
             >
               View My Work →

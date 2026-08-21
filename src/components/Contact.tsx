@@ -34,10 +34,10 @@ function FieldLabel({ children, required }: { children: React.ReactNode; require
 }
 
 const inputClass =
-  'w-full font-sans text-[15px] text-ink bg-transparent border border-ink/25 px-4 py-3 focus:outline-none focus:border-ink focus:bg-white/40 transition-colors duration-200 placeholder:text-ink-muted/40'
+  'w-full font-sans text-[15px] text-ink bg-transparent border border-ink/35 px-4 py-3 focus:outline-none focus:border-ink focus:bg-white/40 transition-colors duration-200 placeholder:text-ink-muted/50'
 
 const selectClass =
-  'w-full font-sans text-[15px] text-ink bg-ivory border border-ink/25 px-4 py-3 focus:outline-none focus:border-ink focus:bg-white/40 transition-colors duration-200 appearance-none cursor-pointer'
+  'w-full font-sans text-[15px] text-ink bg-ivory border border-ink/35 px-4 py-3 focus:outline-none focus:border-ink focus:bg-white/40 transition-colors duration-200 appearance-none cursor-pointer'
 
 export default function Contact() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -260,7 +260,7 @@ export default function Contact() {
                 </div>
 
                 <h3 className="font-serif text-[26px] text-ink mb-3 leading-[1.2]">
-                  Inquiry sent successfully.
+                  ✓ Inquiry received
                 </h3>
 
                 <p className="font-sans text-[15px] text-ink-muted leading-[1.65] max-w-[340px] mx-auto mb-8">

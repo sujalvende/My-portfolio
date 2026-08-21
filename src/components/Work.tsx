@@ -315,16 +315,19 @@ export default function Work() {
                 href={project.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block relative overflow-hidden"
+                className="block relative overflow-hidden group"
                 style={{ aspectRatio: '16/10' }}
                 aria-label={`Open ${project.title}`}
               >
                 <img
                   src={project.image}
                   alt={project.imageAlt}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                   loading="lazy"
                 />
+                <span className="absolute bottom-3 right-3 font-sans text-[10px] uppercase tracking-[0.16em] text-ink bg-ivory/95 px-3 py-2">
+                  View Project ↗
+                </span>
               </a>
 
               {/* Content */}

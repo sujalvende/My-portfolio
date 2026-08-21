@@ -9,19 +9,19 @@ const services = [
     number: '01',
     title: 'Websites',
     description:
-      'Modern, responsive websites for businesses, professionals, and organisations that need a clear and credible online presence.',
+      'Professional websites for businesses, professionals, and organisations that need a clear and credible online presence.',
   },
   {
     number: '02',
     title: 'Web Applications',
     description:
-      'Interactive web applications built around practical functionality, clean interfaces, and straightforward user experience.',
+      'Functional digital products built around real requirements, practical workflows, and a straightforward user experience.',
   },
   {
     number: '03',
     title: 'UI / UX Implementation',
     description:
-      'Turning designs, wireframes, and ideas into polished, pixel-considered, responsive interfaces that work as intended.',
+      'Responsive interfaces turned into polished, considered experiences that work clearly across screen sizes.',
   },
   {
     number: '04',

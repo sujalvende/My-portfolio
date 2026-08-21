@@ -37,6 +37,11 @@ img {
   max-width: 100%;
 }
 
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid #8C7355;
+  outline-offset: 3px;
+}
+
 
 @media (pointer: fine) {
   body.custom-cursor-active,
