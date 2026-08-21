@@ -14,6 +14,7 @@ import Cursor from './components/Cursor'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
 import { supabase, isSupabaseConfigured } from './lib/supabase'
+import { getAdminSession } from './lib/adminAuth'
 
 function ProtectedAdminRoute() {
   const navigate = useNavigate()
@@ -28,22 +29,14 @@ function ProtectedAdminRoute() {
         return
       }
 
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
+      const { session, isAdmin } = await getAdminSession()
 
       if (!session) {
         navigate('/sujal9892/login', { replace: true })
         return
       }
 
-      const { data: adminUser, error } = await supabase
-        .from('admin_users')
-        .select('user_id')
-        .eq('user_id', session.user.id)
-        .maybeSingle()
-
-      if (error || !adminUser) {
+      if (!isAdmin) {
         navigate('/', { replace: true })
         return
       }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
+import { getAdminSession } from '../lib/adminAuth'
 
 export default function AdminLogin() {
   const navigate = useNavigate()
@@ -9,23 +10,18 @@ export default function AdminLogin() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  // Already logged in? Redirect to dashboard
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
+    let active = true
+
+    getAdminSession().then(({ session, isAdmin }) => {
+      if (active && session && isAdmin) {
         navigate('/sujal9892/dashboard', { replace: true })
       }
     })
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
-        navigate('/sujal9892/dashboard', { replace: true })
-      }
-    })
-
-    return () => subscription.unsubscribe()
+    return () => {
+      active = false
+    }
   }, [navigate])
 
   const handleSubmit = async (e: React.FormEvent) => {
