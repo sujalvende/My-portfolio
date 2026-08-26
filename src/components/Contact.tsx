@@ -228,7 +228,7 @@ export default function Contact() {
                 </p>
                 <div className="flex items-center gap-5 pt-0.5">
                   <a
-                    href="https://github.com"
+                    href="https://github.com/sujalvende"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-sans text-[14px] text-ink-mid hover:text-ink transition-colors duration-200"
@@ -236,12 +236,20 @@ export default function Contact() {
                     GitHub ↗
                   </a>
                   <a
-                    href="https://linkedin.com"
+                    href="https://www.linkedin.com/in/sujalvende"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-sans text-[14px] text-ink-mid hover:text-ink transition-colors duration-200"
                   >
                     LinkedIn ↗
+                  </a>
+                  <a
+                    href="/resume.pdf"
+                    download
+                    className="font-sans text-[14px] text-ink-mid hover:text-ink transition-colors duration-200"
+                    aria-label="Download Sujal Vende's resume as a PDF"
+                  >
+                    Download Resume ↗
                   </a>
                 </div>
               </div>

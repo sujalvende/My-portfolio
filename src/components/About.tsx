@@ -63,6 +63,22 @@ export default function About() {
             <p className="about-reveal font-sans text-[16px] md:text-[18px] text-ink-muted leading-[1.72]">
               Right now I'm looking for opportunities to work with people who have ideas worth building. If that's you, I'd like to hear about it.
             </p>
+
+            {/* Resume CTA */}
+            <div className="about-reveal border-t border-stroke pt-7 mt-2 flex flex-wrap items-center gap-5">
+              <a
+                href="/resume.pdf"
+                download
+                className="font-sans text-ink border border-ink/30 hover:border-ink hover:bg-ink hover:text-ivory inline-flex min-h-[44px] items-center gap-2 transition-all duration-250 text-[13px] font-medium tracking-[0.02em] px-6 py-3"
+                aria-label="Download Sujal Vende's resume as a PDF"
+              >
+                Download Resume
+                <span className="inline-block" aria-hidden="true">↗</span>
+              </a>
+              <p className="font-sans text-[14px] text-ink-muted">
+                Want the details? View my resume.
+              </p>
+            </div>
           </div>
         </div>
       </div>
