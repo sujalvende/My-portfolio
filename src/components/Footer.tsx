@@ -27,7 +27,7 @@ export default function Footer() {
           <div className="flex flex-col sm:items-end gap-3">
             <div className="flex items-center gap-6">
               <a
-                href="https://github.com"
+                href="https://github.com/sujalvende"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-sans text-[13px] text-ink-muted hover:text-ink transition-colors duration-200"
@@ -35,7 +35,7 @@ export default function Footer() {
                 GitHub
               </a>
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/in/sujalvende"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-sans text-[13px] text-ink-muted hover:text-ink transition-colors duration-200"
