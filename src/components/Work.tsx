@@ -27,6 +27,39 @@ const projects = [
     imageAlt: 'Learner using the Skill Bridge learning experience',
     theme: 'bg-[#DDE2EC]',
   },
+  {
+    number: '03',
+    title: 'Salon Hair Style',
+    posterTitle: ['SALON', 'HAIR'],
+    url: 'https://salon-hair-style.vercel.app',
+    meta: 'WEB DEVELOPMENT · BEAUTY',
+    description: 'An elegant booking and showcase website for a premium hair salon, blending refined aesthetics with a seamless client experience.',
+    image: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=1400&h=900&fit=crop&auto=format&q=80',
+    imageAlt: 'Stylist at work in a modern hair salon',
+    theme: 'bg-[#EDE0DC]',
+  },
+  {
+    number: '04',
+    title: 'Travel Agency',
+    posterTitle: ['TRAVEL', 'AGENCY'],
+    url: 'https://traveling-agency-website-seven.vercel.app',
+    meta: 'WEB DEVELOPMENT · TRAVEL',
+    description: 'A vibrant travel and pilgrimage package platform that inspires exploration and simplifies the journey from discovery to booking.',
+    image: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1400&h=900&fit=crop&auto=format&q=80',
+    imageAlt: 'Scenic travel destination landscape at golden hour',
+    theme: 'bg-[#D8E8EE]',
+  },
+  {
+    number: '05',
+    title: 'PS PRO Gaming',
+    posterTitle: ['PS PRO', 'GAMING'],
+    url: 'https://advance-admin-panel-gaming-cafe.vercel.app',
+    meta: 'WEB DEVELOPMENT · GAMING',
+    description: 'A bold, immersive platform for a PS5, Sim Racing & VR gaming café — featuring live session booking and an advanced admin dashboard.',
+    image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1400&h=900&fit=crop&auto=format&q=80',
+    imageAlt: 'Immersive gaming setup with vibrant RGB lighting',
+    theme: 'bg-[#D6D8E8]',
+  },
 ]
 
 export default function Work() {
@@ -36,8 +69,7 @@ export default function Work() {
   const mobileCardsRef = useRef<(HTMLDivElement | null)[]>([])
   const [activeIdx, setActiveIdx] = useState(0)
 
-  // Header reveal — identical on every breakpoint, unrelated to the
-  // desktop-only pin timeline below.
+  // Header reveal — identical on every breakpoint
   useEffect(() => {
     if (!headerRef.current) return
 
@@ -55,10 +87,7 @@ export default function Work() {
     return () => ctx.revert()
   }, [])
 
-  // Desktop pinned stacking animation — isolated with gsap.matchMedia() so
-  // mobile/tablet layouts can never inherit or interfere with it, and so it
-  // automatically re-initializes/tears down if the viewport crosses the
-  // 1024px breakpoint (e.g. rotating a tablet) instead of going stale.
+  // Desktop pinned stacking animation
   useEffect(() => {
     const section = sectionRef.current
     if (!section) return
@@ -147,10 +176,6 @@ function PosterCard({ project, index, mobile = false, cardRef }: {
     }
   }
 
-  // Mobile/tablet — compact editorial poster in natural document flow.
-  // No absolute overlap, no fixed heights, no pin/scrub: card height is
-  // fully intrinsic and sized to show most of the card without excessive
-  // scrolling. Order: category label → title → framed photo → copy → CTA.
   if (mobile) {
     return (
       <div
@@ -164,18 +189,15 @@ function PosterCard({ project, index, mobile = false, cardRef }: {
         className={`${project.theme} relative w-full overflow-hidden rounded-[18px] border border-ink/10 shadow-[0_14px_32px_rgba(13,12,11,0.12)]`}
       >
         <div className="flex flex-col gap-2 p-4">
-          {/* Category label + index */}
           <div className="flex items-center justify-between font-sans text-[9px] uppercase tracking-[0.18em] text-ink-mid">
             <span>{project.meta}</span>
             <span>{project.number}</span>
           </div>
 
-          {/* Poster title — compact, not full-screen */}
           <h3 className="text-[clamp(22px,6vw,28px)] font-serif font-medium uppercase leading-[0.88] tracking-[-0.02em] text-ink">
             {project.posterTitle.map((line) => <span key={line} className="block">{line}</span>)}
           </h3>
 
-          {/* Framed photograph — integrated into the poster, kept short */}
           <a
             href={project.url}
             target="_blank"
@@ -192,12 +214,10 @@ function PosterCard({ project, index, mobile = false, cardRef }: {
             />
           </a>
 
-          {/* Short description */}
           <p className="max-w-[440px] font-sans text-[12px] leading-[1.5] text-ink-mid/80">
             {project.description}
           </p>
 
-          {/* CTA */}
           <a
             href={project.url}
             target="_blank"

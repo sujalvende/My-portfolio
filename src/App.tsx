@@ -4,6 +4,7 @@ import Nav from './components/Nav'
 import Hero from './components/Hero'
 import Intro from './components/Intro'
 import Work from './components/Work'
+import ProjectGallery from './components/ProjectGallery'
 import Services from './components/Services'
 import About from './components/About'
 import Skills from './components/Skills'
@@ -89,6 +90,7 @@ function Portfolio() {
         <Hero />
         <Intro />
         <Work />
+        <ProjectGallery />
         <Services />
         <About />
         <Skills />
