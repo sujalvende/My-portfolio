@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
 @import 'tailwindcss';
+@import 'lenis/dist/lenis.css';
 
 @theme {
   --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
@@ -15,8 +16,27 @@
 }
 
 html {
-  scroll-behavior: smooth;
   overflow-x: hidden;
+}
+
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
 }
 
 body {
@@ -41,7 +61,6 @@ img {
   outline: 2px solid #8C7355;
   outline-offset: 3px;
 }
-
 
 @media (pointer: fine) {
   body.custom-cursor-active,

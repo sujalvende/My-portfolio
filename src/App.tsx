@@ -12,6 +12,8 @@ import Process from './components/Process'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 import Cursor from './components/Cursor'
+import SmoothScroll from './components/SmoothScroll'
+import CinematicIntro from './components/CinematicIntro'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
 import { supabase, isSupabaseConfigured } from './lib/supabase'
@@ -81,24 +83,29 @@ function ProtectedAdminRoute() {
   return <AdminDashboard />
 }
 
-// Main portfolio page — all existing sections unchanged
+// Main portfolio page with Cinematic Intro and Lenis Smooth Scroll
 function Portfolio() {
+  const [introFinished, setIntroFinished] = useState(false)
+
   return (
-    <div className="bg-ivory min-h-screen">
-      <Nav />
-      <main>
-        <Hero />
-        <Intro />
-        <Work />
-        <ProjectGallery />
-        <Services />
-        <About />
-        <Skills />
-        <Process />
-        <Contact />
-      </main>
-      <Footer />
-    </div>
+    <SmoothScroll>
+      <CinematicIntro onComplete={() => setIntroFinished(true)} />
+      <div className="bg-ivory min-h-screen">
+        <Nav />
+        <main>
+          <Hero startAnimation={introFinished} />
+          <Intro />
+          <Work />
+          <ProjectGallery />
+          <Services />
+          <About />
+          <Skills />
+          <Process />
+          <Contact />
+        </main>
+        <Footer />
+      </div>
+    </SmoothScroll>
   )
 }
 

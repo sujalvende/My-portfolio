@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
+import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import AnimatedDivider from './AnimatedDivider'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -21,6 +23,22 @@ export interface GalleryItem {
 }
 
 const galleryItems: GalleryItem[] = [
+  {
+    id: 'skyevents-home',
+    title: 'Luxury Wedding & Celebration Showcase',
+    project: 'Sky Events',
+    projectShort: 'Sky Events',
+    category: 'website',
+    categoryLabel: 'Live Website',
+    tag: 'Luxury Event Platform',
+    image: '/screenshots/sky-events.jpg',
+    browserUrl: 'skyevents-website.vercel.app',
+    url: 'https://skyevents-website.vercel.app',
+    description:
+      'Luxury wedding, milestone celebration and corporate gathering management platform crafted with calm, editorial precision from the initial mood board to the final guest.',
+    highlights: ['Editorial luxury aesthetic', 'Bespoke event planning', 'Calm curation'],
+    tech: ['React / Next.js', 'Tailwind CSS', 'Editorial Design'],
+  },
   {
     id: 'gaming-overview',
     title: "Today's Overview & Station Controls",
@@ -241,6 +259,7 @@ export default function ProjectGallery() {
 
   const projectsList = [
     { key: 'all', label: 'All Projects', count: galleryItems.length },
+    { key: 'Sky Events', label: 'Sky Events', count: 1 },
     { key: 'PS PRO Gaming', label: 'PS PRO Gaming', count: 3 },
     { key: 'Maison Aurelle Salon', label: 'Maison Aurelle', count: 3 },
     { key: 'OSD Coaching Classes', label: 'OSD Coaching', count: 2 },
@@ -265,26 +284,33 @@ export default function ProjectGallery() {
     setMobileExpanded(false)
   }
 
-  useEffect(() => {
-    const el = sectionRef.current
-    if (!el) return
+  useGSAP(
+    () => {
+      const el = sectionRef.current
+      if (!el) return
 
-    const ctx = gsap.context(() => {
-      gsap.from(el.querySelectorAll('.gallery-reveal'), {
-        y: 24,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.08,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: el,
-          start: 'top 82%',
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      if (reducedMotion) return
+
+      gsap.fromTo(
+        el.querySelectorAll('.gallery-reveal'),
+        { y: 28, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.85,
+          stagger: 0.08,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 82%',
+            toggleActions: 'play none none reverse',
+          },
         },
-      })
-    }, el)
-
-    return () => ctx.revert()
-  }, [])
+      )
+    },
+    { scope: sectionRef },
+  )
 
   // Modal navigation controls & keyboard shortcuts
   useEffect(() => {
@@ -334,8 +360,9 @@ export default function ProjectGallery() {
     <section
       ref={sectionRef}
       id="gallery"
-      className="border-t border-stroke bg-ivory py-16 md:py-24 lg:py-28"
+      className="relative bg-ivory py-16 md:py-24 lg:py-28 overflow-hidden"
     >
+      <AnimatedDivider />
       <div className="max-w-[1360px] mx-auto px-6 md:px-12 lg:px-20">
         {/* Section Header */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-10 pb-8 border-b border-stroke">

@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
+import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
+import AnimatedDivider from './AnimatedDivider'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -26,7 +28,7 @@ const BUDGET_OPTIONS = [
 
 function FieldLabel({ children, required }: { children: React.ReactNode; required?: boolean }) {
   return (
-    <label className="block font-sans text-[11px] uppercase tracking-[0.18em] text-ink-muted mb-2 font-medium">
+    <label className="block font-sans text-[11px] uppercase tracking-[0.2em] text-ink-muted mb-2 font-medium">
       {children}
       {required && <span className="ml-1 text-bronze">*</span>}
     </label>
@@ -34,10 +36,10 @@ function FieldLabel({ children, required }: { children: React.ReactNode; require
 }
 
 const inputClass =
-  'w-full font-sans text-[15px] text-ink bg-transparent border border-ink/35 px-4 py-3 focus:outline-none focus:border-ink focus:bg-white/40 transition-colors duration-200 placeholder:text-ink-muted/50'
+  'w-full font-sans text-[15px] text-ink bg-transparent border border-ink/30 px-4 py-3 focus:outline-none focus:border-ink focus:bg-white/60 transition-all duration-200 placeholder:text-ink-muted/50 rounded-none'
 
 const selectClass =
-  'w-full font-sans text-[15px] text-ink bg-ivory border border-ink/35 px-4 py-3 focus:outline-none focus:border-ink focus:bg-white/40 transition-colors duration-200 appearance-none cursor-pointer'
+  'w-full font-sans text-[15px] text-ink bg-ivory border border-ink/30 px-4 py-3 focus:outline-none focus:border-ink focus:bg-white/60 transition-all duration-200 appearance-none cursor-pointer rounded-none'
 
 export default function Contact() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -55,21 +57,33 @@ export default function Contact() {
   const [serverError, setServerError] = useState('')
 
   // ── Entrance animation ──────────────────────────────────────────────────
-  useEffect(() => {
-    const el = sectionRef.current
-    if (!el) return
-    const ctx = gsap.context(() => {
-      gsap.from(el.querySelectorAll('.contact-reveal'), {
-        y: 28,
-        opacity: 0,
-        duration: 0.9,
-        stagger: 0.11,
-        ease: 'power2.out',
-        scrollTrigger: { trigger: el, start: 'top 78%' },
-      })
-    }, el)
-    return () => ctx.revert()
-  }, [])
+  useGSAP(
+    () => {
+      const el = sectionRef.current
+      if (!el) return
+
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      if (reducedMotion) return
+
+      gsap.fromTo(
+        el.querySelectorAll('.contact-reveal'),
+        { y: 30, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.9,
+          stagger: 0.1,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 80%',
+            toggleActions: 'play none none reverse',
+          },
+        },
+      )
+    },
+    { scope: sectionRef },
+  )
 
   // ── Success card entrance animation ─────────────────────────────────────
   useEffect(() => {
@@ -176,54 +190,66 @@ export default function Contact() {
   }
 
   return (
-    <section ref={sectionRef} id="contact" className="border-t border-stroke bg-ivory">
-      <div className="max-w-[1280px] mx-auto px-6 md:px-12 lg:px-20 py-14 md:py-24 lg:py-36">
+    <section ref={sectionRef} id="contact" className="relative bg-ivory overflow-hidden">
+      <AnimatedDivider />
+
+      {/* Subtle ambient warm lighting in contact background */}
+      <div
+        className="absolute bottom-10 right-10 w-[500px] h-[500px] rounded-full pointer-events-none opacity-30 blur-[130px]"
+        style={{
+          background: 'radial-gradient(circle, rgba(140, 115, 85, 0.2) 0%, rgba(249, 247, 244, 0) 70%)',
+        }}
+        aria-hidden="true"
+      />
+
+      <div className="relative z-10 max-w-[1280px] mx-auto px-6 md:px-12 lg:px-20 py-16 md:py-28 lg:py-36">
         <div className="grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-16 lg:gap-24 items-start">
           {/* ── Left Column — Heading & Direct Info ────────────────────────── */}
           <div className="contact-reveal">
-            <span className="block font-sans text-[10px] uppercase tracking-[0.22em] text-ink-muted mb-8">
+            <span className="block font-sans text-[10px] uppercase tracking-[0.24em] text-ink-muted mb-6 inline-flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-bronze/70" />
               07 / Contact
             </span>
 
             <h2
-              className="font-serif text-ink leading-[1.08] tracking-[-0.01em] mb-6"
-              style={{ fontSize: 'clamp(34px, 5vw, 64px)' }}
+              className="font-serif text-ink leading-[1.08] tracking-[-0.015em] mb-6"
+              style={{ fontSize: 'clamp(36px, 5vw, 64px)' }}
             >
               Have an idea worth building?
             </h2>
 
-            <p className="font-sans text-[17px] text-ink-muted leading-[1.65] mb-12 max-w-[380px]">
-              Tell me what you're thinking. Let's turn it into something real.
+            <p className="font-sans text-[17px] text-ink-muted leading-[1.65] mb-12 max-w-[400px]">
+              Tell me what you're thinking. Let's collaborate and turn it into something real.
             </p>
 
             {/* Contact details */}
             <div className="space-y-7 border-t border-stroke pt-8">
               <div>
-                <p className="font-sans text-[10px] uppercase tracking-[0.2em] text-ink-muted mb-1.5">
+                <p className="font-sans text-[10px] uppercase tracking-[0.22em] text-ink-muted mb-1.5">
                   Email
                 </p>
                 <a
                   href="mailto:sujalvende9@gmail.com"
-                  className="font-sans text-[15px] text-ink-mid hover:text-ink transition-colors duration-200"
+                  className="font-sans text-[15px] text-ink-mid hover:text-ink hover:underline underline-offset-4 transition-all duration-200"
                 >
                   sujalvende9@gmail.com
                 </a>
               </div>
 
               <div>
-                <p className="font-sans text-[10px] uppercase tracking-[0.2em] text-ink-muted mb-1.5">
+                <p className="font-sans text-[10px] uppercase tracking-[0.22em] text-ink-muted mb-1.5">
                   Phone / WhatsApp
                 </p>
                 <a
                   href="tel:+917977469282"
-                  className="font-sans text-[15px] text-ink-mid hover:text-ink transition-colors duration-200"
+                  className="font-sans text-[15px] text-ink-mid hover:text-ink hover:underline underline-offset-4 transition-all duration-200"
                 >
                   +91 7977469282
                 </a>
               </div>
 
               <div>
-                <p className="font-sans text-[10px] uppercase tracking-[0.2em] text-ink-muted mb-1.5">
+                <p className="font-sans text-[10px] uppercase tracking-[0.22em] text-ink-muted mb-1.5">
                   Profiles
                 </p>
                 <div className="flex items-center gap-5 pt-0.5">
@@ -256,19 +282,19 @@ export default function Contact() {
             </div>
           </div>
 
-          {/* ── Right Column — Restored Refined Minimal Form ──────────────── */}
+          {/* ── Right Column — Refined Minimal Form ──────────────── */}
           <div className="contact-reveal">
             {formState === 'success' ? (
               <div
                 ref={successRef}
-                className="border border-stroke p-10 md:p-12 text-center bg-[#FAF8F5]"
+                className="border border-stroke p-10 md:p-12 text-center bg-[#FAF8F5] shadow-xs"
               >
-                <div className="w-12 h-12 border border-ink/20 rounded-full flex items-center justify-center mx-auto mb-6 text-ink">
+                <div className="w-12 h-12 border border-bronze/40 rounded-full flex items-center justify-center mx-auto mb-6 text-bronze">
                   <span className="text-xl font-serif">✓</span>
                 </div>
 
                 <h3 className="font-serif text-[26px] text-ink mb-3 leading-[1.2]">
-                  ✓ Inquiry received
+                  Inquiry received
                 </h3>
 
                 <p className="font-sans text-[15px] text-ink-muted leading-[1.65] max-w-[340px] mx-auto mb-8">
@@ -277,7 +303,7 @@ export default function Contact() {
 
                 <button
                   onClick={() => setFormState('idle')}
-                  className="font-sans text-[13px] text-ink-muted underline underline-offset-4 hover:text-ink transition-colors duration-200"
+                  className="font-sans text-[13px] text-ink-muted underline underline-offset-4 hover:text-ink transition-colors duration-200 cursor-pointer"
                 >
                   Send another inquiry
                 </button>
@@ -444,7 +470,7 @@ export default function Contact() {
                   <button
                     type="submit"
                     disabled={formState === 'loading'}
-                    className="w-full sm:w-auto font-sans text-[13px] font-medium text-ink border border-ink/40 px-8 py-3.5 hover:bg-ink hover:text-ivory transition-all duration-250 inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full sm:w-auto group font-sans text-[13px] font-medium text-ink border border-ink/40 px-9 py-3.5 hover:bg-ink hover:text-ivory transition-all duration-300 inline-flex items-center justify-center gap-2.5 disabled:opacity-50 disabled:cursor-not-allowed shadow-2xs hover:shadow-md cursor-pointer"
                     style={{ minHeight: 48 }}
                   >
                     {formState === 'loading' ? (
@@ -452,7 +478,7 @@ export default function Contact() {
                     ) : (
                       <>
                         Send Inquiry
-                        <span className="inline-block">→</span>
+                        <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span>
                       </>
                     )}
                   </button>
