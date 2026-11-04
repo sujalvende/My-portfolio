@@ -61,6 +61,19 @@ const projects = [
   },
   {
     number: '05',
+    title: 'Doctor Clinic Website',
+    posterTitle: ['DOCTOR', 'CLINIC'],
+    url: 'https://doctor-clinic-website-portfolio.vercel.app/',
+    meta: 'WEB DEVELOPMENT · HEALTHCARE',
+    description:
+      'A professional clinic website that introduces the doctor, highlights patient-focused care, and makes appointment requests easy.',
+    image: 'https://images.unsplash.com/photo-1758691462878-6edc3d3da1be?w=1400&h=900&fit=crop&auto=format&q=80',
+    imageAlt: 'Doctor consulting with a patient in a medical office',
+    theme: 'bg-[#DCE7E5]',
+    accent: '#4F7F78',
+  },
+  {
+    number: '06',
     title: 'Travel Agency',
     posterTitle: ['TRAVEL', 'AGENCY'],
     url: 'https://traveling-agency-website-seven.vercel.app',
@@ -73,7 +86,7 @@ const projects = [
     accent: '#528294',
   },
   {
-    number: '06',
+    number: '07',
     title: 'PS PRO Gaming',
     posterTitle: ['PS PRO', 'GAMING'],
     url: 'https://advance-admin-panel-gaming-cafe.vercel.app',
